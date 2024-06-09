@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "retailrevamp",
+  "private_key_id": "05fd005573aad3d4c6cb4d9020f716949b8ea6d8",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDKYhZyFoDndoej\nuMpyfLYOctRQoNsX8E7endSm+dSsPExW1T1PvmJgLJ+tN/b753u2tjsKJaFK/7fQ\n0SGPpWVHMRS5SgLFYZ1cgClVG6BUdrHE/32ddUaLlz4kGAq6x2cXf4EgSXbBDPN3\nto4girnhzcHGE4zmd58hCOr8O58epPCYJvwIYu/p6encjAJFhy3hLVyUcZgVhuQ7\nUon3hXbDDZDFyhsXSzI33jNBluo4eR7Q3Ehr+sBrWcU5CR+776jjPifDDaB2cVyi\ng8tFr5ghiS86oixhpmEVx1+k1KdXJ4a9WvyZympab8Zb5+0wuWbQPXyGKdCCJkbU\n4wbYXpDVAgMBAAECggEABkAKBw+/7OF5sYx1m0DmFXWl5N20l51rd0ZZxCbK0t9R\nbF7x4ZywMbk97wlNP7PVdydAy+C/jtg2iIS3wJWbqKS6AMvpu+xtXV4QCLdfzq0d\nTmwlX01UkfGxZ6Li3szlV5+dVU53gc8hHneGTIFWkHrqOJ4K4PddIegUkE+LxzjD\n6Phe3n3dnaR+YlWbXUgHrR5K3O98RGZ91u4uciTrsFuUWcgkCx9U8hoFhtxkAd8v\n9/T5wtdCRbH/5TcnGLQPprQ69iQyTAf04bK/h2QlJtD/1oZx0dMb4tp9zXeSve4L\nVzk5xu7lJeRu8dXYlhXlbpUTNqMUZF2r3/Z0+Grv2QKBgQD40SzrKjOCZ1NfCw9j\nKc2WTXXOBQpOHECkDv9m+GxtTc6Ow36/4zhPCNKG7AEGmLVTds5DY3KsxzZpXudm\nsbtLJH4EhN2OjocPruGQn9jObcjsa5mWUWpSNGl7MxO/6V7R2nxbjM8M6ixxuE0P\n4rv6O3w9MArCQD1WhJlzyJXxLQKBgQDQOcDIxEDcKQ4KIhJ0DfJvJFenA96g5YO+\n+Fm9E5rr439hUIDj7CIqVc28//0Sa/ens3ffhIwJovlzCOb9dFv5Zn9ZAGFQ+rTu\nQQVw4zK2zn83As1drQ/PxPRypS0W7GGegVd8I0e0xpwnAMBF66MOzfqqYhiCzmPV\nRQdrAlDXSQKBgGveY1bgSMxz9xTxOo6HBPXwRu42CS2r2epGBjuh33/Th4UlA8I0\nw6if7oVHs3okohe5HdrhNknpY5Fy72b6DnSZMXjMETFIYQ1Ph8KnSdrUhZLZYxBj\n43AYANLEZf+BMPZRfjBCb1DuBK6Yc/A7H7twJoBwX3mvV+g2PECR6U9RAoGBAJ8s\nJtTSQQqLT7IrTZPtvW98hoyjhqHUERwA2QiSXhEIPS10zrJspclbAgUCYsCcTBqk\nNHRm7G3JaYqoOXtyYYSK97pfcgTnQTwH9FLROslHnTO+LqL3UmjvFDY3Ufp+BDmY\ngfnhNkVYtbGS/2fzsxf0GTP5/OaxQtubAwqoIIgRAoGBAJwR5+xRPHZR0eiXOfhd\nmcTiG71kwHhsto6jhKyGgijTzFPM26i4dy5VJQ9kYfkdJF7T8+uZbFs1x8aOlKtU\nwS13krp2blOr8duVNhTTjhZcWd1A2/6hmu28V26i9qcHUn+oRT+0axRpl+elZreI\nG+31UeGAkuQrnJeGrblWXD73\n-----END PRIVATE KEY-----\n",
+  "client_email": "retailrevamp@retailrevamp.iam.gserviceaccount.com",
+  "client_id": "113896053568265110578",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/retailrevamp%40retailrevamp.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

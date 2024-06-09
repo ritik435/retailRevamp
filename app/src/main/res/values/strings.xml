@@ -1,0 +1,70 @@
+<resources>
+    <string name="app_name">Retail Revamp</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="given">Given</string>
+    <string name="taken">Taken</string>
+    <string name="online">Online</string>
+    <string name="offline">Offline</string>
+    <string name="add_payments">Add payments</string>
+    <string name="add_Khata">Add entry in Khata</string>
+    <string name="add_sales">Add Sales</string>
+    <string name="enter_name">Enter Name</string>
+    <string name="search_name">Search Name</string>
+    <string name="add_collection">Add Collection</string>
+    <string name="all_transactions">All Transactions</string>
+    <string name="view_all">View all</string>
+    <string name="clear"><u>Clear</u></string>
+    <string name="enter">Enter</string>
+    <string name="close">Close</string>
+    <string name="recents">Recent Transactions</string>
+    <string name="hello_name">Hello, name</string>
+    <string name="language_english">English</string>
+    <string name="easy_mode">Easy</string>
+    <string name="pro_mode">Pro</string>
+    <string name="current_language">English</string>
+    <string name="login">Login</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="user_name">Add your userName</string>
+    <string name="user_email">Add your email</string>
+    <string name="user_password">Password</string>
+    <string name="user_confirm_password">Confirm Password</string>
+    <string name="daily_stats">Daily Stats</string>
+    <string name="total_sales">Total Sales</string>
+    <string name="profit_loss">Profit/Loss</string>
+    <string name="x_amount">XX,XXX</string>
+    <string name="today">Today</string>
+    <string name="twenty_four_march">24 March</string>
+    <string name="nine_fifty_time">9:50pm</string>
+    <string name="balance_amount">254</string>
+    <string name="balance">bal:</string>
+    <string name="balance_full">Balance : </string>
+    <string name="total_amount"> total amount</string>
+    <string name="collection_amount"> Collection amount</string>
+    <string name="amount_paid_recieved">amount paid/received</string>
+    <string name="all_transaction"><u>All Transaction</u></string>
+    <string name="create_khata">Create a khata</string>
+    <string name="view_details">View details</string>
+    <string name="view_all_transaction">View All transaction</string>
+    <string name="back_up_on_account">Back up on account</string>
+    <string name="transfer_all_data">Transfer All data</string>
+    <string name="erase_all_data">Erase All data</string>
+    <string name="logout">Logout</string>
+    <string name="settings">Settings</string>
+    <string name="last_backup">Last backup \n <i>23 March 2023</i></string>
+    <string name="refer_a_shop_owner">Refer a shop owner</string>
+    <string name="name">Name :</string>
+    <string name="phone_number">Phone Number :</string>
+    <string name="write_name_of_khata">Write the name of khata</string>
+    <string name="mention_phone">Mention the phone number</string>
+    <string name="khata_book">Khata Book</string>
+
+
+    <string name="sample_name">Ritik Arora</string>
+    <string name="sample_email">email@gmail.com</string>
+    <string name="sample_phone">99999999999</string>
+
+    <string name="openDrawer">Open Drawer</string>
+    <string name="closeDrawer">Close Drawer</string>
+
+</resources>

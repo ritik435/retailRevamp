@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
+    <group>
+        <item
+            android:title="@string/create_khata"
+            android:id="@+id/create_khata"
+            android:icon="@drawable/iv_back_btn_black">
+        </item>
+        <item
+            android:title="@string/view_all_transaction"
+            android:id="@+id/view_all_transaction"
+            android:icon="@drawable/iv_back_btn_black">
+        </item>
+        <item
+            android:title="@string/back_up_on_account"
+            android:id="@+id/back_up_on_account"
+            android:icon="@drawable/iv_back_btn_black">
+        </item>
+        <item
+            android:title="@string/transfer_all_data"
+            android:id="@+id/transfer_all_data"
+            android:icon="@drawable/iv_back_btn_black">
+        </item>
+        <item
+            android:title="@string/erase_all_data"
+            android:id="@+id/erase_all_data"
+            android:icon="@drawable/iv_back_btn_black">
+        </item>
+        <item
+            android:title="@string/logout"
+            android:id="@+id/logout"
+            android:icon="@drawable/iv_back_btn_black">
+        </item>
+    </group>
+
+</menu>

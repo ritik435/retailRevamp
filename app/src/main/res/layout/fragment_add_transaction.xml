@@ -1,0 +1,535 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/transparent"
+    tools:context=".Fragment.AddTransactionFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/transparent"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/ll_close_add_transaction"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginRight="10dp"
+            android:background="@color/white"
+            android:orientation="horizontal"
+            android:paddingHorizontal="10dp"
+            android:visibility="visible">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/close"
+                android:textColor="?colorSecondary"
+                android:textSize="14dp" />
+
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/iv_upside_green_arrow" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/white"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="25dp"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <View
+                        android:layout_width="70dp"
+                        android:layout_height="5dp"
+                        android:background="@color/black_10" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/txt_transaction_type"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="10dp"
+                    android:letterSpacing=".1"
+                    style="@style/textHeading"
+                    android:text="@string/add_payments"
+                    android:textColor="@color/decreasing_red" />
+
+                <LinearLayout
+                    android:id="@+id/ll_payment"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="visible"
+                    android:layout_marginTop="20dp"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="60dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:paddingHorizontal="10dp">
+
+                        <EditText
+                            android:id="@+id/et_add_user_name"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"
+                            style="@style/textLight"
+                            android:paddingLeft="3dp"
+                            android:background="@drawable/background_tansaction_boundary"
+                            android:hint="@string/add_payments" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"
+                            android:orientation="horizontal">
+
+                            <EditText
+                                android:id="@+id/et_total_amount"
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:background="@drawable/background_tansaction_boundary"
+                                android:hint="@string/total_amount"
+                                android:inputType="number"
+                                style="@style/textSubscript"
+                                android:paddingLeft="2dp" />
+
+                            <EditText
+                                android:id="@+id/et_amount_transferred"
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:background="@drawable/background_tansaction_boundary"
+                                android:hint="@string/amount_paid_recieved"
+                                style="@style/textSubscript"
+                                android:inputType="number"
+                                android:paddingLeft="2dp" />
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="80dp"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:background="@drawable/background_tansaction_boundary"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:layout_width="80dp"
+                            android:layout_height="0dp"
+                            android:layout_gravity="center"
+                            android:layout_weight="1"
+                            android:background="@drawable/background_tansaction_boundary"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:src="@color/decreasing_red" />
+
+                            <ImageView
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:src="@color/increasing_green" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="80dp"
+                            android:layout_height="0dp"
+                            android:layout_gravity="center"
+                            android:layout_weight="1"
+                            android:background="@drawable/background_tansaction_boundary"
+                            android:orientation="horizontal">
+
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/ll_enter"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_gravity="center"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="5dp"
+                        android:background="@drawable/background_tansaction_boundary"
+                        android:gravity="center"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/txt_enter"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/enter"
+                            android:textColor="?colorSecondary"
+                            android:textSize="12dp" />
+                    </LinearLayout>
+                </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/ll_sales"
+                    android:layout_width="match_parent"
+                    android:layout_height="35dp"
+                    android:visibility="visible"
+                    android:layout_marginTop="20dp"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:paddingHorizontal="10dp">
+
+                        <EditText
+                            android:id="@+id/et_add_sales_user_name"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"
+                            style="@style/textLight"
+                            android:paddingLeft="3dp"
+                            android:background="@drawable/background_tansaction_boundary"
+                            android:hint="@string/enter_name" />
+
+                    </LinearLayout>
+                    <EditText
+                        android:id="@+id/et_total_amount_sales"
+                        android:layout_width="wrap_content"
+                        android:minWidth="80dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginRight="10dp"
+                        android:background="@drawable/background_tansaction_boundary"
+                        android:hint="@string/total_amount"
+                        android:inputType="number"
+                        style="@style/textSubscript"
+                        android:paddingLeft="5dp" />
+                    <RadioGroup
+                        android:layout_width="60dp"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:padding="1dp"
+                        android:background="@drawable/background_tansaction_boundary"
+                        android:orientation="vertical">
+                        <RadioButton
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"
+                            style="@style/textSubscript"
+                            android:textAlignment="center"
+                            android:text="@string/online"
+                            android:button="@color/transparent"
+                            android:textColor="@color/white"
+                            android:background="@color/decreasing_red"/>
+                        <RadioButton
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"
+                            style="@style/textSubscript"
+                            android:textAlignment="center"
+                            android:text="@string/offline"
+                            android:button="@color/transparent"
+                            android:textColor="@color/black_50"
+                            android:background="@color/white"/>
+                    </RadioGroup>
+
+                    <LinearLayout
+                        android:id="@+id/ll_enter_sales"
+                        android:layout_width="40dp"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="5dp"
+                        android:background="@drawable/background_tansaction_boundary"
+                        android:gravity="center"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/txt_enter_sales"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/enter"
+                            android:textColor="?colorSecondary"
+                            android:textSize="12dp" />
+                    </LinearLayout>
+                </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/ll_collection"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="visible"
+                    android:layout_marginTop="20dp"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:paddingHorizontal="10dp">
+
+                        <RadioGroup
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+                            <RadioButton
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Cash Collection"
+                                android:paddingVertical="0dp"
+                                style="@style/textSubscript"/>
+                            <RadioButton
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Online Collection"
+                                android:paddingVertical="0dp"
+                                style="@style/textSubscript"/>
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content">
+
+                                <RadioButton
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Others"
+                                    android:paddingVertical="0dp"
+                                    style="@style/textSubscript"/>
+                                <EditText
+                                    android:id="@+id/et_other_collections"
+                                    android:layout_width="wrap_content"
+                                    android:minWidth="100dp"
+                                    android:layout_height="35dp"
+                                    android:layout_marginStart="5dp"
+                                    style="@style/textSubscript"
+                                    android:paddingStart="5dp"/>
+                            </LinearLayout>
+                        </RadioGroup>
+
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="120dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:orientation="vertical">
+                    <EditText
+                        android:id="@+id/et_total_collection"
+                        android:layout_width="match_parent"
+                        android:minWidth="80dp"
+                        android:layout_height="35dp"
+                        android:layout_marginEnd="10dp"
+                        android:background="@drawable/background_tansaction_boundary"
+                        android:hint="@string/collection_amount"
+                        android:inputType="number"
+                        style="@style/textSubscript"
+                        android:paddingStart="5dp"/>
+
+                        <LinearLayout
+                            android:id="@+id/ll_initial"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@color/transparent"
+                            android:orientation="horizontal"
+                            android:gravity="left"
+                            android:layout_marginLeft="5dp"
+                            android:elevation="0dp"
+                            app:layout_constraintBottom_toTopOf="@+id/rl_close"
+                            app:layout_constraintEnd_toEndOf="parent">
+
+                            <ImageView
+                                android:id="@+id/iv_checked"
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_marginRight="10dp"
+                                android:visibility="gone"
+                                android:src="@drawable/iv_upside_green_arrow"/>
+                            <ImageView
+                                android:id="@+id/iv_un_checked"
+                                android:layout_width="20dp"
+                                android:layout_margin="2dp"
+                                android:layout_height="20dp"
+                                android:src="@drawable/iv_downside_arrow"/>
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="?colorSecondary"
+                                android:singleLine="false"
+                                style="@style/textSubscript"
+                                android:text="Set as initial collection"/>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/ll_enter_collection"
+                        android:layout_width="40dp"
+                        android:layout_height="wrap_content"
+                        android:minHeight="40dp"
+                        android:layout_gravity="center"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="5dp"
+                        android:background="@drawable/background_tansaction_boundary"
+                        android:gravity="center"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/txt_enter_collection"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/enter"
+                            android:textColor="?colorSecondary"
+                            android:textSize="12dp" />
+                    </LinearLayout>
+                </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/ll_entry_in_khata"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="visible"
+                    android:layout_marginTop="20dp"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:paddingHorizontal="10dp">
+
+                        <EditText
+                            android:id="@+id/et_add_khata_user_name"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"
+                            style="@style/textLight"
+                            android:paddingLeft="3dp"
+                            android:background="@drawable/background_tansaction_boundary"
+                            android:hint="@string/search_name" />
+
+                    </LinearLayout>
+                    <EditText
+                        android:id="@+id/et_total_amount_khata"
+                        android:layout_width="wrap_content"
+                        android:minWidth="80dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginRight="10dp"
+                        android:background="@drawable/background_tansaction_boundary"
+                        android:hint="@string/total_amount"
+                        android:inputType="number"
+                        style="@style/textSubscript"
+                        android:paddingLeft="5dp" />
+                    <RadioGroup
+                        android:layout_width="60dp"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:padding="1dp"
+                        android:background="@drawable/background_tansaction_boundary"
+                        android:orientation="vertical">
+                        <RadioButton
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"
+                            style="@style/textSubscript"
+                            android:textAlignment="center"
+                            android:text="@string/given"
+                            android:button="@color/transparent"
+                            android:textColor="@color/white"
+                            android:background="@color/decreasing_red"/>
+                        <RadioButton
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"
+                            style="@style/textSubscript"
+                            android:textAlignment="center"
+                            android:text="@string/taken"
+                            android:button="@color/transparent"
+                            android:textColor="@color/black_50"
+                            android:background="@color/white"/>
+                    </RadioGroup>
+
+                    <LinearLayout
+                        android:id="@+id/ll_enter_entry_in_khata"
+                        android:layout_width="40dp"
+                        android:layout_height="wrap_content"
+                        android:minHeight="40dp"
+                        android:layout_gravity="center"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="5dp"
+                        android:background="@drawable/background_tansaction_boundary"
+                        android:gravity="center"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/txt_enter_khata"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/enter"
+                            android:textColor="?colorSecondary"
+                            android:textSize="12dp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/txt_clear"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginLeft="12dp"
+                        android:text="@string/clear"
+                        android:textColor="?colorSecondary"
+                        android:textSize="12dp" />
+
+
+                    <ImageView
+                        android:id="@+id/iv_undo"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginLeft="10dp"
+                        android:src="@color/decreasing_red" />
+
+                </LinearLayout>
+            </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_recents"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@color/white"
+                android:backgroundTint="@color/white"
+                android:clipToPadding="true"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/ll_recents" />
+        </LinearLayout>
+    </LinearLayout>
+
+</FrameLayout>
