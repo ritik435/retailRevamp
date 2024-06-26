@@ -38,6 +38,7 @@
         </LinearLayout>
 
         <androidx.core.widget.NestedScrollView
+            android:id="@+id/nsv_create_khata"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
@@ -214,7 +215,6 @@
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/rv_all_khata"
                         android:layout_width="match_parent"
-                        android:nestedScrollingEnabled="false"
                         android:layout_height="wrap_content" />
                 </LinearLayout>
             </LinearLayout>

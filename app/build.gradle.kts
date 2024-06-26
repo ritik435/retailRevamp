@@ -3,14 +3,14 @@ plugins {
 }
 
 android {
-    namespace = "com.example.retailrevamp"
+    namespace = "com.neotechInnovations.retailrevamp"
     compileSdk = 34
     defaultConfig {
-        applicationId = "com.example.retailrevamp"
+        applicationId = "com.neotechInnovations.retailrevamp"
         minSdk = 23
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.2"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
