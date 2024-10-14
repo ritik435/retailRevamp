@@ -44,6 +44,7 @@
     <string name="amount_paid_recieved">amount paid/received</string>
     <string name="all_transaction"><u>All Transaction</u></string>
     <string name="create_khata">Create a khata</string>
+    <string name="view_all_khata">View all khata</string>
     <string name="view_details">View details</string>
     <string name="view_all_transaction">View All transaction</string>
     <string name="back_up_on_account">Back up on account</string>

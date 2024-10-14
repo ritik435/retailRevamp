@@ -27,13 +27,14 @@
                 android:src="@drawable/iv_back_btn_black" />
 
             <TextView
+                android:id="@+id/txt_create_heading"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginLeft="20dp"
                 android:text="@string/create_khata"
                 android:textColor="@color/black"
-                android:textSize="16dp" />
+                style="@style/textSubHeading"/>
 
         </LinearLayout>
 
@@ -48,10 +49,12 @@
                 android:orientation="vertical">
 
                 <LinearLayout
+                    android:id="@+id/ll_create_main_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="20dp"
                     android:background="@color/black_10"
+                    android:visibility="visible"
                     android:orientation="vertical">
 
                     <LinearLayout
@@ -81,8 +84,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/name"
-                            android:textColor="@color/black"
-                            android:textSize="16dp" />
+                            android:textColor="?colorOnPrimary"
+                            style="@style/textSubHeading" />
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -100,16 +103,16 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="#"
-                                    android:textColor="@color/black"
-                                    android:textSize="16dp" />
+                                    android:textColor="?colorOnPrimary"
+                                    style="@style/textSubHeading" />
 
                                 <TextView
                                     android:id="@+id/txt_khata_serial_number"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="2"
-                                    android:textColor="@color/black"
-                                    android:textSize="16dp" />
+                                    android:textColor="?colorOnPrimary"
+                                    style="@style/textSubHeading" />
                             </LinearLayout>
 
                             <EditText
@@ -120,8 +123,9 @@
                                 android:background="@drawable/background_language_boundary"
                                 android:hint="@string/write_name_of_khata"
                                 android:paddingHorizontal="5dp"
+                                android:textColorHint="?colorPrimaryVariant"
                                 android:paddingLeft="5dp"
-                                android:textSize="14dp" />
+                                style="@style/textBold"/>
                         </LinearLayout>
 
                         <TextView
@@ -129,8 +133,8 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="30dp"
                             android:text="@string/phone_number"
-                            android:textColor="@color/black"
-                            android:textSize="16dp" />
+                            android:textColor="?colorOnPrimary"
+                            style="@style/textSubHeading" />
 
                         <EditText
                             android:id="@+id/et_khata_user_phone_number"
@@ -141,7 +145,8 @@
                             android:hint="@string/mention_phone"
                             android:inputType="number"
                             android:paddingLeft="10dp"
-                            android:textSize="14dp" />
+                            android:textColorHint="?colorPrimaryVariant"
+                            style="@style/textBold"/>
 
                         <androidx.cardview.widget.CardView
                             android:id="@+id/cv_create_khata"
@@ -161,7 +166,7 @@
                                 android:layout_marginRight="40dp"
                                 android:text="@string/create_khata"
                                 android:textColor="@color/black"
-                                android:textSize="16dp" />
+                                style="@style/textBold" />
 
                             <ImageView
                                 android:layout_width="20dp"
@@ -181,10 +186,11 @@
                     android:orientation="vertical">
 
                     <LinearLayout
-                        android:id="@+id/ll_recents"
+                        android:id="@+id/ll_all_khata"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
+                        android:visibility="gone"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent">
 
@@ -209,6 +215,7 @@
                             android:layout_marginRight="10dp"
                             android:onClick="onClick"
                             android:text="@string/view_all"
+                            android:visibility="gone"
                             android:textColor="?colorSecondary" />
                     </LinearLayout>
 

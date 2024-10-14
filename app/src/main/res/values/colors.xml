@@ -7,4 +7,5 @@
     <color name="transparent">#00FFFFFF</color>
     <color name="increasing_green">#238823</color>
     <color name="decreasing_red">#D2222D</color>
+    <color name="grey">#C6C2C2</color>
 </resources>

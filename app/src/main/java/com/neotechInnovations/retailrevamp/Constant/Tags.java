@@ -17,6 +17,13 @@ public class Tags {
     public static String KEY_ADD_ENTRY_IN_KHATA="addEntryInKhata";
     public static String KEY_ADD_INITIAL="addInitial";
     public static String KEY_ADD_COLLECTION="addCollection";
+    public static String KEY_CREATE_KHATA="createKhata";
+    public static String KEY_VIEW_KHATA="viewKhata";
+    public static String KEY_DEBIT="debit";
+    public static String KEY_CREDIT="credit";
+    public static String KEY_ONLINE="online";
+    public static String KEY_OFFLINE="offline";
+    public static String KEY_CHEQUE="cheque";
     public static String DATE_FORMAT="dd MMMM yy";
     public static String TIME_FORMAT="hh:mma";
     public static String PREFIX_SPREADSHEET_LINK="https://docs.google.com/spreadsheets/d/";

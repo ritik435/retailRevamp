@@ -52,6 +52,7 @@ public class KhataAdapter extends RecyclerView.Adapter<KhataAdapter.KhataViewHol
         holder.txtKhataUserName.setText(khataModel.getKhataUserName());
         holder.txtKhataPhoneNumber.setText(khataModel.getKhataUserPhone());
         holder.txtKhataSerialNumber.setText(khataModel.getKhataSerialNumber());
+        holder.txtKhataBalance.setText(String.valueOf(khataModel.getKhataBalance()));
 
         holder.cvViewDetails.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -78,7 +79,7 @@ public class KhataAdapter extends RecyclerView.Adapter<KhataAdapter.KhataViewHol
 
     public static class KhataViewHolder extends RecyclerView.ViewHolder {
         CardView cvViewDetails;
-        TextView txtKhataUserName, txtKhataPhoneNumber, txtKhataBalance, txtKhataSerialNumber;
+        TextView txtKhataUserName, txtKhataPhoneNumber, txtKhataBalance, txtKhataSerialNumber ;
         ImageView ivKhataUserImage;
 
         public KhataViewHolder(@NonNull View itemView) {

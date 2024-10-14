@@ -7,11 +7,29 @@ import java.util.UUID;
 
 public class KhataModel implements Serializable {
     UUID khataUserId;
+    String khataUserIdString;
     String khataSerialNumber;
     String khataUserName;
     UUID khataUserImage;
+    int khataBalance;
     String khataUserPhone;
     JSONArray khataTransactions;
+
+    public int getKhataBalance() {
+        return khataBalance;
+    }
+
+    public void setKhataBalance(int khataBalance) {
+        this.khataBalance = khataBalance;
+    }
+
+    public String getKhataUserIdString() {
+        return khataUserIdString;
+    }
+
+    public void setKhataUserIdString(String khataUserIdString) {
+        this.khataUserIdString = khataUserIdString;
+    }
 
     public String getKhataSerialNumber() {
         return khataSerialNumber;

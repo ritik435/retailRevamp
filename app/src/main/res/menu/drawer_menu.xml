@@ -9,6 +9,11 @@
             android:icon="@drawable/iv_back_btn_black">
         </item>
         <item
+            android:title="@string/view_all_khata"
+            android:id="@+id/view_all_khata"
+            android:icon="@drawable/iv_back_btn_black">
+        </item>
+        <item
             android:title="@string/view_all_transaction"
             android:id="@+id/view_all_transaction"
             android:icon="@drawable/iv_back_btn_black">

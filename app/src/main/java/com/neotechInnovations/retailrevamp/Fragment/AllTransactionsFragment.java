@@ -2,16 +2,15 @@ package com.neotechInnovations.retailrevamp.Fragment;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.neotechInnovations.retailrevamp.Activity.HomepageActivity;
 import com.neotechInnovations.retailrevamp.Adapter.TransactionAdapter;
@@ -104,21 +103,21 @@ public class AllTransactionsFragment extends Fragment {
 //        addElementsInRecents();
         initialiseTransactionRecyclerView();
     }
-
-    private void addElementsInRecents() {
-        for (int i=0;i<60;i++){
-            TransactionModel transactionModel=new TransactionModel();
-            transactionModel.setMode("Online");
-            transactionModel.setTotalAmount(30000);
-
-            transactionModel.setPaymentType("Debit");
-            transactionModel.setAmountTransferred(29900+i);
-            String s= String.valueOf(Integer.valueOf(i));
-            transactionModel.setUserName(s);
-            transactionModel.setBalance(i+100);
-            transactionModelList.add(transactionModel);
-        }
-    }
+//
+//    private void addElementsInRecents() {
+//        for (int i=0;i<60;i++){
+//            TransactionModel transactionModel=new TransactionModel();
+//            transactionModel.setMode("Online");
+//            transactionModel.setTotalAmount(30000);
+//
+//            transactionModel.setPaymentType("Debit");
+//            transactionModel.setAmountTransferred(29900+i);
+//            String s= String.valueOf(Integer.valueOf(i));
+//            transactionModel.setUserName(s);
+//            transactionModel.setBalance(i+100);
+//            transactionModelList.add(transactionModel);
+//        }
+//    }
     public void initialiseTransactionRecyclerView(){
         transactionAdapter= new TransactionAdapter(transactionModelList,activity);
         rvRecentTransaction.setLayoutManager(new LinearLayoutManager(activity,LinearLayoutManager.VERTICAL,false));

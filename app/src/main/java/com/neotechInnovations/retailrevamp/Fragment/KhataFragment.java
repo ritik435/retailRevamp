@@ -46,12 +46,13 @@ public class KhataFragment extends Fragment {
     private KhataModel khataModel;
     private String mParam2;
     private List<TransactionModel> transactionModelList=new ArrayList<>();
-    TextView txtKhataUserName,txtKhataUserPhone,txtKhataUserSerialNumber;
+    TextView txtKhataUserName,txtKhataUserPhone,txtKhataUserSerialNumber,txtKhataBalance;
     RecyclerView rvKhataTransactions;
     ImageView ivKhataUserImage,ivBackBtn;
     TransactionAdapter khataTransactions;
     CardView cvAddEntryInKhata;
     HomepageActivity activity;
+    static int balance;
 
     public KhataFragment() {
         // Required empty public constructor
@@ -103,6 +104,9 @@ public class KhataFragment extends Fragment {
         ivKhataUserImage=view.findViewById(R.id.iv_khata_user_image);
         ivBackBtn=view.findViewById(R.id.iv_back_btn);
         cvAddEntryInKhata=view.findViewById(R.id.cv_add_entry_khata);
+        txtKhataBalance=view.findViewById(R.id.txt_khata_balance);
+
+        balance=0;
     }
     @SuppressLint("ClickableViewAccessibility")
     private void manipulateViews() {
@@ -133,7 +137,7 @@ public class KhataFragment extends Fragment {
                     cvAddEntryInKhata.setAlpha(0.5f);
                 } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
                     cvAddEntryInKhata.setAlpha(1f);
-                    ((HomepageActivity)activity).manipulateAddTransactionFragment(Tags.KEY_ADD_ENTRY_IN_KHATA,true,khataModel.getKhataSerialNumber());
+                    ((HomepageActivity)activity).manipulateAddTransactionFragment(Tags.KEY_ADD_ENTRY_IN_KHATA,true,khataModel.getKhataUserIdString());
                 }
                 return true;
             }
@@ -156,17 +160,27 @@ public class KhataFragment extends Fragment {
 //            transactionModelList.add(transactionModel);
 //        }
         transactionModelList=new ArrayList<>();
+        balance=0;
         for (int i=0;i<HomepageActivity.khataTransactionModelList.size();i++){
             TransactionModel transactionModel=HomepageActivity.khataTransactionModelList.get(i);
-            if (transactionModel.getKhataNumber()!=null && khataModel.getKhataSerialNumber()!=null && khataModel.getKhataSerialNumber().equals(transactionModel.getKhataNumber())){
-                Log.d(TAG, "addTransaction: AddEntryInKhata: "+transactionModel.getKhataNumber());
+                Log.d(TAG, "addTransaction: AddEntryInKhata: "+transactionModel.getKhataNumber() + " khataModel.getKhataUserIdString(): "+khataModel.getKhataUserIdString());
+            if (transactionModel.getKhataNumber()!=null && khataModel.getKhataUserIdString()!=null && khataModel.getKhataUserIdString().equals(transactionModel.getKhataNumber())){
                 transactionModelList.add(transactionModel);
+                if (transactionModel.getPaymentType()!=null) {
+                    if (transactionModel.getPaymentType().equals(Tags.KEY_DEBIT)) {
+                        balance -= transactionModel.getAmountTransferred();
+                    } else if (transactionModel.getPaymentType().equals(Tags.KEY_CREDIT)) {
+                        balance += transactionModel.getAmountTransferred();
+                    }
+                }
             }
         }
         if (khataTransactions!=null) {
             khataTransactions.transactionModelList = transactionModelList;
             khataTransactions.notifyDataSetChanged();
         }
+        String balanceStr=String.valueOf(balance);
+        txtKhataBalance.setText(balanceStr);
 //        transactionModelList=HomepageActivity.khataTransactionModelList;
     }
     public void initialiseTransactionRecyclerView(){

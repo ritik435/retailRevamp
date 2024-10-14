@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -14,8 +15,11 @@ import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.AttrRes;
+import androidx.annotation.ColorInt;
 import androidx.cardview.widget.CardView;
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
@@ -24,6 +28,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.neotechInnovations.retailrevamp.Activity.HomepageActivity;
 import com.neotechInnovations.retailrevamp.Adapter.KhataAdapter;
+import com.neotechInnovations.retailrevamp.Constant.Tags;
 import com.neotechInnovations.retailrevamp.Model.KhataModel;
 import com.neotechInnovations.retailrevamp.R;
 import com.neotechInnovations.retailrevamp.Utils.SharedPreference;
@@ -46,19 +51,22 @@ public class CreateKhataFragment extends Fragment {
     private static final String TAG = "CreateKhataFragment";
 
     // TODO: Rename and change types of parameters
-    private String mParam1;
+    private String khataOpeningType;
     private String mParam2;
     HomepageActivity activity;
     KhataAdapter allKhataAdapter;
     RecyclerView rvAllKhata;
     ImageView ivBackBtn;
     EditText etKhataUserName, etKhataUserPhoneNumber;
-    TextView txtKhataUserSerialNumber,txtDeleteKhata;
+    TextView txtKhataUserSerialNumber, txtDeleteKhata;
     NestedScrollView nsvCreateKhata;
     CardView cvCreateKhata;
     ImageView ivKhataUserImage;
     Animation shakeAnimation;
     List<KhataModel> khataModelList = new ArrayList<>();
+    TextView txtCreateHeading;
+    LinearLayout llCreateMainContainer, llAllKhata;
+
 
     public CreateKhataFragment() {
         // Required empty public constructor
@@ -86,7 +94,7 @@ public class CreateKhataFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
+            khataOpeningType = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
         activity = (HomepageActivity) getActivity();
@@ -114,10 +122,24 @@ public class CreateKhataFragment extends Fragment {
         cvCreateKhata = view.findViewById(R.id.cv_create_khata);
         txtDeleteKhata = view.findViewById(R.id.txt_delete_khata);
         nsvCreateKhata = view.findViewById(R.id.nsv_create_khata);
+        txtCreateHeading = view.findViewById(R.id.txt_create_heading);
+        llCreateMainContainer = view.findViewById(R.id.ll_create_main_container);
+        llAllKhata = view.findViewById(R.id.ll_all_khata);
     }
 
     @SuppressLint("ClickableViewAccessibility")
     private void manipulateViews() {
+
+        if (khataOpeningType.equals(Tags.KEY_VIEW_KHATA)) {
+            llAllKhata.setVisibility(View.GONE);
+            llCreateMainContainer.setVisibility(View.GONE);
+            txtCreateHeading.setText("Khata Book");
+        }else if (khataOpeningType.equals(Tags.KEY_CREATE_KHATA)) {
+            llAllKhata.setVisibility(View.VISIBLE);
+            llCreateMainContainer.setVisibility(View.VISIBLE);
+            txtCreateHeading.setText("Create a Khata");
+        }
+
         addElementInKhata();
         initialiseKhataEntryRecyclerView();
         resetCreateKhata();
@@ -133,11 +155,11 @@ public class CreateKhataFragment extends Fragment {
                     if (inArea) {
                         txtDeleteKhata.setAlpha(1f);
                         Log.d(TAG, "onTouch: manipulateAddTransactionFragment : cvAddCollection to call ");
-                        SharedPreference sharedPreference=new SharedPreference(activity);
+                        SharedPreference sharedPreference = new SharedPreference(activity);
                         SharedPreference.clearNewKhataList();
-                        khataModelList=new ArrayList<>();
-                        HomepageActivity.newKhataList=khataModelList;
-                        allKhataAdapter.khataModelList=khataModelList;
+                        khataModelList = new ArrayList<>();
+                        HomepageActivity.newKhataList = khataModelList;
+                        allKhataAdapter.khataModelList = khataModelList;
                         allKhataAdapter.notifyDataSetChanged();
                     }
                 } else if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
@@ -214,15 +236,16 @@ public class CreateKhataFragment extends Fragment {
     }
 
     private void addElementInKhata() {
-        khataModelList=HomepageActivity.newKhataList;
+        khataModelList = HomepageActivity.newKhataList;
     }
+
     private void saveInLocal(List<KhataModel> newKhataList) {
         // Save the list to SharedPreferences
         SharedPreference.savenNewKhataLists(newKhataList);
     }
 
     private void initialiseKhataEntryRecyclerView() {
-        Log.d(TAG, "initialiseKhataEntryRecyclerView: "+khataModelList);
+        Log.d(TAG, "initialiseKhataEntryRecyclerView: " + khataModelList);
         allKhataAdapter = new KhataAdapter(khataModelList, activity);
         rvAllKhata.setLayoutManager(new LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false));
         rvAllKhata.setAdapter(allKhataAdapter);
@@ -232,13 +255,15 @@ public class CreateKhataFragment extends Fragment {
         String userName = etKhataUserName.getText().toString();
         String phoneNumber = etKhataUserPhoneNumber.getText().toString();
         String serialNumber = txtKhataUserSerialNumber.getText().toString();
+        etKhataUserName.setHintTextColor(resolveColorAttribute(activity, com.google.android.material.R.attr.colorPrimaryVariant));
+
         if (userName.equals("") || userName.equals("null")) {
-            etKhataUserName.setHintTextColor(getResources().getColor(R.color.decreasing_red));
+            etKhataUserName.setHintTextColor(resolveColorAttribute(activity, com.google.android.material.R.attr.colorOnSurfaceInverse));
             etKhataUserName.setAnimation(shakeAnimation);
             return;
         }
         if (phoneNumber.equals("") || phoneNumber.equals("null")) {
-            etKhataUserPhoneNumber.setHintTextColor(getResources().getColor(R.color.decreasing_red));
+            etKhataUserPhoneNumber.setHintTextColor(resolveColorAttribute(activity, com.google.android.material.R.attr.colorOnSurfaceInverse));
             etKhataUserPhoneNumber.setAnimation(shakeAnimation);
             return;
         }
@@ -249,10 +274,17 @@ public class CreateKhataFragment extends Fragment {
         khataModel.setKhataUserPhone(phoneNumber);
         khataModel.setKhataUserId(UUID.randomUUID());
 
+        String khatauserIdString = "";
+        khatauserIdString += "(#";
+        khatauserIdString += serialNumber;
+        khatauserIdString += ") ";
+        khatauserIdString += userName;
+        khataModel.setKhataUserIdString(khatauserIdString);
 
         khataModelList.add(khataModel);
+        HomepageActivity.suggestedKhataList.add(khataModel.getKhataUserIdString());
         allKhataAdapter.notifyItemInserted(khataModelList.size() - 1);
-        Log.d(TAG, "createKhata: rvAllKhata.getChildAt(khataModelList.size() - 1) ::: "+rvAllKhata.getChildAt(khataModelList.size() - 2));
+        Log.d(TAG, "createKhata: rvAllKhata.getChildAt(khataModelList.size() - 1) ::: " + rvAllKhata.getChildAt(khataModelList.size() - 2));
         try {
             final float y = rvAllKhata.getChildAt(khataModelList.size() - 2).getY();
             nsvCreateKhata.post(new Runnable() {
@@ -262,8 +294,8 @@ public class CreateKhataFragment extends Fragment {
                     nsvCreateKhata.smoothScrollTo(0, (int) y);
                 }
             });
-        }catch (Exception e){
-            Log.d(TAG, "createKhata: exception in scrolling::::: AddEntryInKhata: "+e.getMessage());
+        } catch (Exception e) {
+            Log.d(TAG, "createKhata: exception in scrolling::::: AddEntryInKhata: " + e.getMessage());
         }
 //        rvAllKhata.scrollToPosition(khataModelList.size() - 1);
 //        rvAllKhata.setNestedScrollingEnabled(true);
@@ -272,9 +304,16 @@ public class CreateKhataFragment extends Fragment {
 //            rvAllKhata.setNestedScrollingEnabled(false);
 //        },5000);
 
-        HomepageActivity.newKhataList=khataModelList;
+        HomepageActivity.newKhataList = khataModelList;
         saveInLocal(khataModelList);
         resetCreateKhata();
+    }
+
+    @ColorInt
+    private int resolveColorAttribute(Context mContext, @AttrRes int attr) {
+        TypedValue typedValue = new TypedValue();
+        mContext.getTheme().resolveAttribute(attr, typedValue, true);
+        return typedValue.data;
     }
 
     public void resetCreateKhata() {
@@ -288,7 +327,7 @@ public class CreateKhataFragment extends Fragment {
 //        etKhataUserPhoneNumber.setFocusable(true);
 
         txtKhataUserSerialNumber.setText("");
-        int size=khataModelList.size();
+        int size = khataModelList.size();
         size++;
         String serialNumber1 = String.valueOf(size);
         txtKhataUserSerialNumber.setText(serialNumber1);

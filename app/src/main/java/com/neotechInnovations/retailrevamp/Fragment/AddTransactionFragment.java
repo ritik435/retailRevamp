@@ -1,9 +1,12 @@
 package com.neotechInnovations.retailrevamp.Fragment;
 
+import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -12,9 +15,13 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
@@ -22,8 +29,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.neotechInnovations.retailrevamp.Activity.HomepageActivity;
+import com.neotechInnovations.retailrevamp.Adapter.SuggestedAdapter;
 import com.neotechInnovations.retailrevamp.Adapter.TransactionAdapter;
 import com.neotechInnovations.retailrevamp.Constant.Tags;
+import com.neotechInnovations.retailrevamp.Model.KhataModel;
 import com.neotechInnovations.retailrevamp.Model.TransactionModel;
 import com.neotechInnovations.retailrevamp.R;
 
@@ -60,10 +69,19 @@ public class AddTransactionFragment extends Fragment {
     private List<TransactionModel> specificTransactionModelList = new ArrayList<>();
     private TransactionAdapter transactionAdapter;
     Animation shakeAnimation;
-    EditText etAddKhataUserName,etAddSalesUserName,etTotalAmountKhata,etTotalAmountSales,etTotalCollection,etOtherCollections;
-    LinearLayout llEnterSales,llEnterCollection,llEnterEntryInKhata,llInitial;
-    ImageView ivChecked,ivUnchecked;
-    String entryKhataName="";
+    EditText etAddKhataUserName, etAddSalesUserName, etTotalAmountKhata, etTotalAmountSales, etTotalCollection, etOtherCollections;
+    LinearLayout llEnterSales, llEnterCollection, llEnterEntryInKhata, llInitial, llOtherCollections;
+    RelativeLayout rlSuggestedKhata;
+    ImageView ivChecked, ivUnchecked, ivOpenSuggestedKhata;
+    String entryKhataName = "";
+    RecyclerView rvSuggestedKhata;
+    SuggestedAdapter suggestedAdapter;
+    List<String> suggestedKhataList;
+    Boolean isSuggestedKhataOpened, isValidKhata;
+    RadioGroup rgCollection;
+    RadioButton radioButton, rbSalesOnline, rbSalesOffline, rbKhataEntryGiven, rbKhataEntryTaken, rbCollectionCash, rbCollectionOther, rbCollectionOnline;
+    ImageView ivPaymentOffline, ivPaymentOnline, ivPaymentCheque;
+    Boolean setAsInitial = false;
 
     public AddTransactionFragment() {
         // Required empty public constructor
@@ -124,23 +142,112 @@ public class AddTransactionFragment extends Fragment {
         llEnterSales = view.findViewById(R.id.ll_enter_sales);
         etTotalCollection = view.findViewById(R.id.et_total_collection);
         llEnterCollection = view.findViewById(R.id.ll_enter_collection);
-        etOtherCollections = view.findViewById(R.id.et_other_collections);
+        etOtherCollections = view.findViewById(R.id.et_collection_others);
+        llOtherCollections = view.findViewById(R.id.ll_collection_others);
         llInitial = view.findViewById(R.id.ll_initial);
         ivChecked = view.findViewById(R.id.iv_checked);
         ivUnchecked = view.findViewById(R.id.iv_un_checked);
         etAddKhataUserName = view.findViewById(R.id.et_add_khata_user_name);
         etTotalAmountKhata = view.findViewById(R.id.et_total_amount_khata);
         llEnterEntryInKhata = view.findViewById(R.id.ll_enter_entry_in_khata);
+        rlSuggestedKhata = view.findViewById(R.id.rl_suggested_khata);
+        ivOpenSuggestedKhata = view.findViewById(R.id.iv_open_suggested_khata);
+        rvSuggestedKhata = view.findViewById(R.id.rv_suggested_khata);
+        ivPaymentOnline = view.findViewById(R.id.iv_payment_online);
+        ivPaymentOffline = view.findViewById(R.id.iv_payment_offline);
+        ivPaymentCheque = view.findViewById(R.id.iv_payment_cheque);
+        rbSalesOffline = view.findViewById(R.id.rb_sales_offline);
+        rbSalesOnline = view.findViewById(R.id.rb_sales_online);
+        rbCollectionCash = view.findViewById(R.id.rb_collection_cash);
+        rbCollectionOnline = view.findViewById(R.id.rb_collection_online);
+        rbCollectionOther = view.findViewById(R.id.rb_collection_others);
+        rbKhataEntryGiven = view.findViewById(R.id.rb_khata_entry_given);
+        rbKhataEntryTaken = view.findViewById(R.id.rb_khata_entry_taken);
+        rgCollection = view.findViewById(R.id.rg_collection);
+//        radioButton.setButtonDrawable(R.drawable.background_manipulate_modes_debit);
 
-        manipulateViews();
+        manipulateViews(view);
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    private void manipulateViews() {
+    private void manipulateViews(View view) {
+
         Log.d(TAG, "manipulateViews: ");
+        isSuggestedKhataOpened = false;
+        isValidKhata = false;
+        rlSuggestedKhata.setVisibility(View.GONE);
+        suggestedKhataList = HomepageActivity.suggestedKhataList;
+        Log.d(TAG, "manipulateViews: REFINEKHATA : suggestedKhataList :: " + suggestedKhataList.size());
+
         manipulateAddTransactionType();
         initialiseTransactionRecyclerView();
+        initialiseSuggestedKhata();
+        ivChecked.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ivUnchecked.setVisibility(View.VISIBLE);
+                ivChecked.setVisibility(View.GONE);
+                setAsInitial = false;
+            }
+        });
+        ivUnchecked.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ivUnchecked.setVisibility(View.GONE);
+                ivChecked.setVisibility(View.VISIBLE);
+                setAsInitial = true;
+            }
+        });
+        rgCollection.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                if (checkedId == R.id.rb_collection_cash) {
+                    ivUnchecked.setVisibility(View.GONE);
+                    ivChecked.setVisibility(View.VISIBLE);
+                    setAsInitial = true;
+                } else if (checkedId == R.id.rb_collection_online) {
+                    llOtherCollections.setVisibility(View.GONE);
+                    ivUnchecked.setVisibility(View.VISIBLE);
+                    ivChecked.setVisibility(View.GONE);
+                    setAsInitial = false;
+                } else if (checkedId == R.id.rb_collection_others) {
+                    llOtherCollections.setVisibility(View.VISIBLE);
+                    ivUnchecked.setVisibility(View.VISIBLE);
+                    ivChecked.setVisibility(View.GONE);
+                    setAsInitial = false;
+                }
+            }
+        });
+        etAddKhataUserName.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
 
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
+                if (count > 0) {
+                    manipulateSuggestedKhata(true);
+                } else {
+                    manipulateSuggestedKhata(false);
+                }
+                isValidKhata = false;
+                String str = etAddKhataUserName.getText().toString();
+                Log.d(TAG, "onTextChanged: REFINEKHATA: str::: " + str + " : originalList suggestedKhataList:::12c: " + suggestedKhataList.size());
+                suggestedAdapter.filter(str);
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+        ivOpenSuggestedKhata.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                manipulateSuggestedKhata(!isSuggestedKhataOpened);
+            }
+        });
 
         llEnterEntryInKhata.setOnTouchListener(new View.OnTouchListener() {
             private boolean inArea = false;
@@ -154,7 +261,13 @@ public class AddTransactionFragment extends Fragment {
                     if (inArea) {
                         llEnterEntryInKhata.setAlpha(1f);
                         Log.d(TAG, "onTouch: manipulateAddTransactionFragment : cvAddCollection to call ");
-                        validAsTransaction(etAddKhataUserName,etTotalAmountKhata,etTotalAmountKhata);
+                        String paymentType= Tags.KEY_CREDIT;
+                        if (rbKhataEntryGiven.isChecked()){
+                            paymentType = Tags.KEY_DEBIT;
+                        } else if (rbKhataEntryTaken.isChecked()) {
+                            paymentType = Tags.KEY_CREDIT;
+                        }
+                        validAsTransaction(etAddKhataUserName, etTotalAmountKhata, etTotalAmountKhata, paymentType);
                     }
                 } else if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
                     Log.d(TAG, "onTouch: manipulateAddTransactionFragment MOVEDD ");
@@ -182,7 +295,8 @@ public class AddTransactionFragment extends Fragment {
                     if (inArea) {
                         llEnterSales.setAlpha(1f);
                         Log.d(TAG, "onTouch: manipulateAddTransactionFragment : cvAddCollection to call ");
-                        validAsTransaction(etAddSalesUserName,etTotalAmountSales,etTotalAmountSales);
+                        String paymentType = Tags.KEY_CREDIT;
+                        validAsTransaction(etAddSalesUserName, etTotalAmountSales, etTotalAmountSales, paymentType);
                     }
                 } else if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
                     Log.d(TAG, "onTouch: manipulateAddTransactionFragment MOVEDD ");
@@ -210,7 +324,9 @@ public class AddTransactionFragment extends Fragment {
                     if (inArea) {
                         llEnterCollection.setAlpha(1f);
                         Log.d(TAG, "onTouch: manipulateAddTransactionFragment : cvAddCollection to call ");
-                        validAsTransaction(etOtherCollections,etTotalCollection,etTotalCollection);
+                        String paymentType = Tags.KEY_CREDIT;
+
+                        validAsTransaction(etOtherCollections, etTotalCollection, etTotalCollection, paymentType);
                     }
                 } else if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
                     Log.d(TAG, "onTouch: manipulateAddTransactionFragment MOVEDD ");
@@ -251,11 +367,12 @@ public class AddTransactionFragment extends Fragment {
                     inArea = true;
                     llEnterPayment.setAlpha(0.5f);
                 } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
-                    Log.d(TAG, "onTouch: manipulateAddTransactionFragment : llEnterPayment UP "+inArea);
+                    Log.d(TAG, "onTouch: manipulateAddTransactionFragment : llEnterPayment UP " + inArea);
                     if (inArea) {
                         llEnterPayment.setAlpha(1f);
                         Log.d(TAG, "onTouch: manipulateAddTransactionFragment : llEnterPayment to call ");
-                        validAsTransaction(etAddUserName,etTotalAmount,etAmountTransferred);
+                        String paymentType = Tags.KEY_DEBIT;
+                        validAsTransaction(etAddUserName, etTotalAmount, etAmountTransferred, paymentType);
                     }
                 } else if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
                     Log.d(TAG, "onTouch: manipulateAddTransactionFragment MOVEDD ");
@@ -273,6 +390,40 @@ public class AddTransactionFragment extends Fragment {
         });
     }
 
+    private void manipulateSuggestedKhata(boolean toOpen) {
+        if (toOpen != isSuggestedKhataOpened)
+            rotateIcon();
+        if (toOpen) {
+            rlSuggestedKhata.setVisibility(View.VISIBLE);
+            isSuggestedKhataOpened = true;
+        } else {
+            rlSuggestedKhata.setVisibility(View.GONE);
+            isSuggestedKhataOpened = false;
+        }
+
+    }
+
+    private void initialiseSuggestedKhata() {
+        Log.d(TAG, "initialiseSuggestedKhata: REFINEKHATA : suggestedKhataList : " + suggestedKhataList.size());
+        suggestedAdapter = new SuggestedAdapter(suggestedKhataList, new SuggestedAdapter.OnItemClicked() {
+            @Override
+            public void suggestedKhataClicked(String suggestedKhata, Boolean toCreate) {
+                if (toCreate) {
+                    //close this and open create khata fragment...
+                    ((HomepageActivity) activity).manipulateAddTransactionFragment("", false, "");
+                    ((HomepageActivity) activity).manipulateCreateKhataFragment(true, Tags.KEY_CREATE_KHATA);
+                } else {
+                    //fill the khataIdString in etKhataUserName
+                    etAddKhataUserName.setText(suggestedKhata);
+                    manipulateSuggestedKhata(false);
+                    isValidKhata = true;
+                }
+            }
+        });
+        rvSuggestedKhata.setLayoutManager(new LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false));
+        rvSuggestedKhata.setAdapter(suggestedAdapter);
+    }
+
     private boolean isInsideButtonArea(View v, MotionEvent event) {
         // Check if the touch event coordinates are within the button's bounds
         return event.getX() >= 0 && event.getX() <= v.getWidth() &&
@@ -288,36 +439,57 @@ public class AddTransactionFragment extends Fragment {
             llEntryInKhata.setVisibility(View.GONE);
             txtTransactionType.setText(Tags.STRING_ADD_COLLECTION);
             specificTransactionModelList = HomepageActivity.collectionTransactionModelList;
-        }
-        else if (keyAddTransaction.equals(Tags.KEY_ADD_SALES)) {
+//            manipulateCollectionMode();
+        } else if (keyAddTransaction.equals(Tags.KEY_ADD_SALES)) {
             llSales.setVisibility(View.VISIBLE);
             llPayment.setVisibility(View.GONE);
             llCollection.setVisibility(View.GONE);
             llEntryInKhata.setVisibility(View.GONE);
             txtTransactionType.setText(Tags.STRING_ADD_SALES);
             specificTransactionModelList = HomepageActivity.salesTransactionModelList;
-        }
-        else if (keyAddTransaction.equals(Tags.KEY_ADD_ENTRY_IN_KHATA)) {
+            manipulateSalesMode();
+        } else if (keyAddTransaction.equals(Tags.KEY_ADD_ENTRY_IN_KHATA)) {
             llSales.setVisibility(View.GONE);
             llPayment.setVisibility(View.GONE);
             llCollection.setVisibility(View.GONE);
             llEntryInKhata.setVisibility(View.VISIBLE);
             txtTransactionType.setText(Tags.STRING_ADD_ENTRY_IN_KHATA);
             specificTransactionModelList = HomepageActivity.khataTransactionModelList;
-            Log.d(TAG, "manipulateAddTransactionType: AddEntryInKhata: "+entryKhataName);
+            Log.d(TAG, "manipulateAddTransactionType: AddEntryInKhata: " + entryKhataName);
             etAddKhataUserName.setText(entryKhataName);
-        }
-        else if (keyAddTransaction.equals(Tags.KEY_ADD_PAYMENTS)) {
+            if (!entryKhataName.isEmpty()) {
+                isValidKhata = true;
+            }
+            manipulateKhataEntryMode();
+        } else if (keyAddTransaction.equals(Tags.KEY_ADD_PAYMENTS)) {
             llSales.setVisibility(View.GONE);
             llPayment.setVisibility(View.VISIBLE);
             llCollection.setVisibility(View.GONE);
             llEntryInKhata.setVisibility(View.GONE);
             txtTransactionType.setText(Tags.STRING_ADD_PAYMENTS);
             specificTransactionModelList = HomepageActivity.paymentTransactionModelList;
+            ivPaymentOnline.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    manipulatePaymentMode(Tags.KEY_ONLINE);
+                }
+            });
+            ivPaymentOffline.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    manipulatePaymentMode(Tags.KEY_OFFLINE);
+                }
+            });
+            ivPaymentCheque.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    manipulatePaymentMode(Tags.KEY_CHEQUE);
+                }
+            });
         }
     }
 
-    private void addTransaction(String userName, Integer amountTransfer, Integer totalAmountInt, Integer balance, String modeOfPayment ) {
+    private void addTransaction(String userName, Integer amountTransfer, Integer totalAmountInt, Integer balance, String modeOfPayment, String paymentType) {
         TransactionModel transactionModel = new TransactionModel();
         transactionModel.setUserName(userName);
         transactionModel.setAmountTransferred(amountTransfer);
@@ -326,8 +498,9 @@ public class AddTransactionFragment extends Fragment {
         transactionModel.setMode(modeOfPayment);
         transactionModel.setTransaction(true);
         transactionModel.setKey(keyAddTransaction);
+        transactionModel.setPaymentType(paymentType);
         if (keyAddTransaction.equals(Tags.KEY_ADD_ENTRY_IN_KHATA)) {
-            Log.d(TAG, "addTransaction: AddEntryInKhata: "+userName);
+            Log.d(TAG, "addTransaction: AddEntryInKhata: " + userName);
             transactionModel.setKhataNumber(userName);
         }
 
@@ -336,6 +509,18 @@ public class AddTransactionFragment extends Fragment {
 
         transactionModelList.add(1, transactionModel);
         specificTransactionModelList.add(1, transactionModel);
+        if (keyAddTransaction.equals(Tags.KEY_ADD_ENTRY_IN_KHATA)){
+            for (int i=0;i<HomepageActivity.newKhataList.size();i++){
+                KhataModel khataModel=HomepageActivity.newKhataList.get(i);
+                if (khataModel.getKhataUserIdString().equals(transactionModel.getKhataNumber())){
+                    if (transactionModel.getMode().equals(Tags.KEY_DEBIT)){
+                        khataModel.setKhataBalance(khataModel.getKhataBalance()-transactionModel.getTotalAmount());
+                    }else if (transactionModel.getMode().equals(Tags.KEY_CREDIT)){
+                        khataModel.setKhataBalance(khataModel.getKhataBalance()+transactionModel.getTotalAmount());
+                    }
+                }
+            }
+        }
 
         Log.d(TAG, "addTransaction: transaction added in transactionModelList: " + transactionModelList.size());
         Log.d(TAG, "addTransaction: transaction added in SPECIFICtransactionModelList: " + specificTransactionModelList.size());
@@ -348,33 +533,47 @@ public class AddTransactionFragment extends Fragment {
         resetAddTransadtion();
     }
 
-    private void validAsTransaction(EditText etUserNameGeneric,EditText etTotalAmountGeneric,EditText etAmountTransferredGeneric) {
+    private void validAsTransaction(EditText etUserNameGeneric, EditText etTotalAmountGeneric, EditText etAmountTransferredGeneric, String paymentType) {
         Log.d(TAG, "addTransaction: enteredd.... " + keyAddTransaction);
-            String userName = etUserNameGeneric.getText().toString();
-            String totalAmount = etTotalAmountGeneric.getText().toString();
-            String amountTransferred = etAmountTransferredGeneric.getText().toString();
 
-            if (userName.equals("") || userName.equals("null")) {
-                etUserNameGeneric.setAnimation(shakeAnimation);
-                etUserNameGeneric.setHintTextColor(getResources().getColor(R.color.decreasing_red));
-                return;
-            }
-            if (totalAmount.equals("") || totalAmount.equals("null")) {
-                etTotalAmountGeneric.setHintTextColor(getResources().getColor(R.color.decreasing_red));
-                etTotalAmountGeneric.setAnimation(shakeAnimation);
-                return;
-            }
-            if (amountTransferred.equals("") || amountTransferred.equals("null")) {
-                etAmountTransferredGeneric.setHintTextColor(getResources().getColor(R.color.decreasing_red));
-                etAmountTransferredGeneric.setAnimation(shakeAnimation);
-                return;
-            }
-            Integer amountTransfer = Integer.valueOf(amountTransferred);
-            Integer totalAmountInt = Integer.valueOf(totalAmount);
-            Integer balance = totalAmountInt - amountTransfer;
+        String userName = etUserNameGeneric.getText().toString();
+        String totalAmount = etTotalAmountGeneric.getText().toString();
+        String amountTransferred = etAmountTransferredGeneric.getText().toString();
+        etUserNameGeneric.setHintTextColor(getResources().getColor(R.color.black));
+        if (keyAddTransaction.equals(Tags.KEY_ADD_COLLECTION)){
+            Log.d(TAG, "validAsTransaction: rbCollectionOnline.isChecked() : "+ rbCollectionOnline.isChecked()+" rbCollectionCash.isChecked() : "+rbCollectionCash.isChecked());
+            if (rbCollectionOnline.isChecked()) {
+                userName = rbCollectionOnline.getText().toString();
+            } else if (rbCollectionCash.isChecked())
+                userName = rbCollectionCash.getText().toString();
+        }
+        if (keyAddTransaction.equals(Tags.KEY_ADD_ENTRY_IN_KHATA) && !isValidKhata) {
+            etUserNameGeneric.setText("");
+            etUserNameGeneric.setAnimation(shakeAnimation);
+            etUserNameGeneric.setHintTextColor(getResources().getColor(R.color.decreasing_red));
+            return;
+        }
+        if (userName.equals("") || userName.equals("null")) {
+            etUserNameGeneric.setAnimation(shakeAnimation);
+            etUserNameGeneric.setHintTextColor(getResources().getColor(R.color.decreasing_red));
+            return;
+        }
+        if (totalAmount.equals("") || totalAmount.equals("null")) {
+            etTotalAmountGeneric.setHintTextColor(getResources().getColor(R.color.decreasing_red));
+            etTotalAmountGeneric.setAnimation(shakeAnimation);
+            return;
+        }
+        if (amountTransferred.equals("") || amountTransferred.equals("null")) {
+            etAmountTransferredGeneric.setHintTextColor(getResources().getColor(R.color.decreasing_red));
+            etAmountTransferredGeneric.setAnimation(shakeAnimation);
+            return;
+        }
+        Integer amountTransfer = Integer.valueOf(amountTransferred);
+        Integer totalAmountInt = Integer.valueOf(totalAmount);
+        Integer balance = totalAmountInt - amountTransfer;
 
-            String modeOfPayment = "online";
-            addTransaction(userName, amountTransfer, totalAmountInt, balance, modeOfPayment);
+        String modeOfPayment = "online";
+        addTransaction(userName, amountTransfer, totalAmountInt, balance, modeOfPayment, paymentType);
 
     }
 
@@ -453,6 +652,9 @@ public class AddTransactionFragment extends Fragment {
         etTotalCollection.setText("");
         etAddKhataUserName.setText("");
         etTotalAmountKhata.setText("");
+        rbCollectionOnline.setChecked(false);
+        rbCollectionCash.setChecked(false);
+        rbCollectionOther.setChecked(false);
 //        txtKhataUserSerialNumber.setText("");
 //        String serialNumber1 = String.valueOf(khataModelList.size());
 //        txtKhataUserSerialNumber.setText(serialNumber1);
@@ -465,11 +667,88 @@ public class AddTransactionFragment extends Fragment {
         rvRecents.setAdapter(transactionAdapter);
     }
 
+    private void rotateIcon() {
+        // Create an ObjectAnimator to rotate the icon
+        ObjectAnimator rotateAnimator = ObjectAnimator.ofFloat(ivOpenSuggestedKhata, "rotation", 0f, 180f);
+        rotateAnimator.setDuration(300); // Set duration of animation in milliseconds
+        rotateAnimator.start();
+    }
+
     public static void hideKeyboard(Activity activity) {
         View view = activity.findViewById(android.R.id.content);
         if (view != null) {
             InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
+    }
+
+    void manipulatePaymentMode(String key) {
+        if (key.equals(Tags.KEY_ONLINE)) {
+            ivPaymentOnline.setAlpha(1f);
+            ivPaymentOffline.setAlpha(0.3f);
+            ivPaymentCheque.setAlpha(0.3f);
+        } else if (key.equals(Tags.KEY_OFFLINE)) {
+            ivPaymentOnline.setAlpha(0.3f);
+            ivPaymentOffline.setAlpha(1f);
+            ivPaymentCheque.setAlpha(0.3f);
+        } else if (key.equals(Tags.KEY_CHEQUE)) {
+            ivPaymentOnline.setAlpha(0.3f);
+            ivPaymentOffline.setAlpha(0.3f);
+            ivPaymentCheque.setAlpha(1f);
+        }
+    }
+
+    void manipulateSalesMode() {
+
+        rbSalesOnline.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                rbSalesOffline.setChecked(false);
+            }
+        });
+        rbSalesOffline.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                rbSalesOnline.setChecked(false);
+            }
+        });
+    }
+
+    void manipulateKhataEntryMode() {
+
+        rbKhataEntryGiven.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+            }
+        });
+        rbKhataEntryTaken.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+            }
+        });
+    }
+
+    void manipulateCollectionMode() {
+        rbCollectionCash.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                rbCollectionOther.setChecked(false);
+                rbCollectionOnline.setChecked(false);
+            }
+        });
+        rbCollectionOnline.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                rbCollectionOther.setChecked(false);
+                rbCollectionCash.setChecked(false);
+            }
+        });
+        rbCollectionOther.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                rbCollectionCash.setChecked(false);
+                rbCollectionOnline.setChecked(false);
+            }
+        });
     }
 }

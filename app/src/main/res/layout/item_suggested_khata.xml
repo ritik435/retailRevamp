@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:id="@+id/ll_show_khata"
+        android:layout_width="match_parent"
+        android:layout_marginHorizontal="5dp"
+        android:visibility="gone"
+        android:layout_height="50dp">
+
+        <TextView
+            android:id="@+id/txt_suggested_khata_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            style="@style/textBold"
+            android:textColor="?colorOnPrimary"
+            android:text="(#1) Ritik arora"/>
+
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/ll_create_khata"
+        android:layout_width="match_parent"
+        android:layout_marginHorizontal="5dp"
+        android:layout_height="50dp">
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/iv_add"
+            app:tint="?colorOnPrimary" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            style="@style/textBold"
+            android:textColor="?colorOnPrimary"
+            android:text="Create a khata"/>
+
+    </LinearLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

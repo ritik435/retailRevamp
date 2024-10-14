@@ -89,6 +89,7 @@ public class HomepageActivity extends AppCompatActivity {
     public static List<TransactionModel> paymentTransactionModelList = new ArrayList<>();
     public static List<TransactionModel> khataTransactionModelList = new ArrayList<>();
     public static List<KhataModel> newKhataList = new ArrayList<>();
+    public static List<String> suggestedKhataList=new ArrayList<>();
     StatsticsInfoAdapter statsticsInfoAdapter;
     TransactionAdapter transactionAdapter;
     Integer language;
@@ -132,7 +133,6 @@ public class HomepageActivity extends AppCompatActivity {
     @SuppressLint("ClickableViewAccessibility")
     private void manipulateViews() {
 
-        createKhataFragment = CreateKhataFragment.newInstance("", "");
         isProMode = false;
         isEasyMode = true;
         isAddTransactionFragmentOpened = false;
@@ -264,6 +264,7 @@ public class HomepageActivity extends AppCompatActivity {
         retrieveDataFromLocal();
         initialiseStatsInfoRecyclerView();
         calcAllStatsInfo();
+        refineKhataIds();
         addTransactionBottomSheetBehavior = BottomSheetBehavior.from(flAddTransaction);
         addTransactionBottomSheetBehavior.setHideable(true);
         addTransactionBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
@@ -294,8 +295,6 @@ public class HomepageActivity extends AppCompatActivity {
 
             }
         });
-
-
         txtAllTransaction.setOnTouchListener(new View.OnTouchListener() {
             private boolean inArea = false;
             @Override
@@ -323,7 +322,6 @@ public class HomepageActivity extends AppCompatActivity {
                 return true;
             }
         });
-
         cvAddCollection.setOnTouchListener(new View.OnTouchListener() {
             private boolean inArea = false;
 
@@ -438,6 +436,25 @@ public class HomepageActivity extends AppCompatActivity {
         });
     }
 
+    private void refineKhataIds() {
+        Log.d(TAG, "refineKhataIds: REFINEKHATA : newKhataList : "+newKhataList.size());
+        for (int i=0;i<newKhataList.size();i++){
+            KhataModel khataModel=newKhataList.get(i);
+            if (khataModel.getKhataUserIdString()==null){
+                String khatauserIdString="";
+                khatauserIdString+="(#";
+                khatauserIdString+=khataModel.getKhataSerialNumber();
+                khatauserIdString+=") ";
+                khatauserIdString+=khataModel.getKhataUserName();
+                newKhataList.get(i).setKhataUserIdString(khatauserIdString);
+                suggestedKhataList.add(khatauserIdString);
+            }else {
+                suggestedKhataList.add(khataModel.getKhataUserIdString());
+            }
+        }
+        Log.d(TAG, "refineKhataIds: REFINEKHATA : suggestedKhataList : "+suggestedKhataList.size());
+    }
+
     private void navigationLayoutAdjustment() {
         nvSidebarMenu.getViewTreeObserver().addOnGlobalLayoutListener(
                 new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -485,7 +502,10 @@ public class HomepageActivity extends AppCompatActivity {
                 manipulateLoginFragment(true);
             } else if (item.getItemId() == R.id.create_khata) {
                 Log.d(TAG, "NavClick: 4");
-                manipulateCreateKhataFragment(true);
+                manipulateCreateKhataFragment(true,Tags.KEY_CREATE_KHATA);
+            } else if (item.getItemId() == R.id.view_all_khata) {
+                Log.d(TAG, "NavClick: 4a");
+                manipulateCreateKhataFragment(true,Tags.KEY_VIEW_KHATA);
             } else if (item.getItemId() == R.id.erase_all_data) {
                 Log.d(TAG, "NavClick: 5");
                 SharedPreference.clearLists();
@@ -521,7 +541,7 @@ public class HomepageActivity extends AppCompatActivity {
         } else if (isKhataFragmentOpened) {
             manipulateKhataFragment(false,null);
         } else if (isCreateKhataFragmentOpened) {
-            manipulateCreateKhataFragment(false);
+            manipulateCreateKhataFragment(false,Tags.KEY_VIEW_KHATA);
         } else if (isLoginFragmentOpened) {
             manipulateLoginFragment(false);
         }
@@ -574,8 +594,9 @@ public class HomepageActivity extends AppCompatActivity {
         }
     }
 
-    public void manipulateCreateKhataFragment(boolean toOpen) {
+    public void manipulateCreateKhataFragment(boolean toOpen , String khataOpening) {
         if (toOpen) {
+            createKhataFragment = CreateKhataFragment.newInstance(khataOpening, "");
             flCreateKhataFragment.setVisibility(View.VISIBLE);
             getSupportFragmentManager().beginTransaction()
 //                    .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_right)
@@ -612,35 +633,35 @@ public class HomepageActivity extends AppCompatActivity {
         }
     }
 
-
-    private void addElementsInRecents() {
-        TransactionModel transactionModel1 = new TransactionModel();
-        transactionModel1.setMode("Online");
-        transactionModel1.setTotalAmount(30000);
-
-        transactionModel1.setPaymentType("Debit");
-        transactionModel1.setAmountTransferred(29900 + 1);
-        String w = String.valueOf(Integer.valueOf(1));
-        transactionModel1.setUserName(w);
-        transactionModel1.setBalance(1 + 100);
-
-        salesTransactionModelList.add(transactionModel1);
-        khataTransactionModelList.add(transactionModel1);
-        paymentTransactionModelList.add(transactionModel1);
-        for (int i = 0; i < 1; i++) {
-            TransactionModel transactionModel = new TransactionModel();
-            transactionModel.setMode("Online");
-            transactionModel.setTotalAmount(30000);
-
-            transactionModel.setPaymentType("Debit");
-            transactionModel.setAmountTransferred(29900 + i);
-            String s = String.valueOf(Integer.valueOf(i));
-            transactionModel.setUserName(s);
-            transactionModel.setBalance(i + 100);
-            transactionModelList.add(transactionModel);
-            collectionTransactionModelList.add(transactionModel);
-        }
-    }
+//
+//    private void addElementsInRecents() {
+//        TransactionModel transactionModel1 = new TransactionModel();
+//        transactionModel1.setMode("Online");
+//        transactionModel1.setTotalAmount(30000);
+//
+//        transactionModel1.setPaymentType("Debit");
+//        transactionModel1.setAmountTransferred(29900 + 1);
+//        String w = String.valueOf(Integer.valueOf(1));
+//        transactionModel1.setUserName(w);
+//        transactionModel1.setBalance(1 + 100);
+//
+//        salesTransactionModelList.add(transactionModel1);
+//        khataTransactionModelList.add(transactionModel1);
+//        paymentTransactionModelList.add(transactionModel1);
+//        for (int i = 0; i < 1; i++) {
+//            TransactionModel transactionModel = new TransactionModel();
+//            transactionModel.setMode("Online");
+//            transactionModel.setTotalAmount(30000);
+//
+//            transactionModel.setPaymentType("Debit");
+//            transactionModel.setAmountTransferred(29900 + i);
+//            String s = String.valueOf(Integer.valueOf(i));
+//            transactionModel.setUserName(s);
+//            transactionModel.setBalance(i + 100);
+//            transactionModelList.add(transactionModel);
+//            collectionTransactionModelList.add(transactionModel);
+//        }
+//    }
 
     public void initialiseTransactionRecyclerView() {
         transactionAdapter = new TransactionAdapter(transactionModelList, this);
@@ -741,7 +762,7 @@ public class HomepageActivity extends AppCompatActivity {
         if (newKhataList == null) {
             newKhataList = new ArrayList<>();
         }
-
+        Log.d(TAG, "retrieveDataFromLocal: REFINEKHATA : newKhataList : "+newKhataList.size());
 
         initialiseTransactionRecyclerView();
     }
