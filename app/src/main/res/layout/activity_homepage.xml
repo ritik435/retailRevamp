@@ -39,46 +39,46 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
 
-                    <ImageView
-                        android:id="@+id/iv_hamburger_menu"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:layout_gravity="center"
-                        android:src="@drawable/iv_downside_arrow"
-                        android:visibility="gone" />
-
                     <com.google.android.material.appbar.AppBarLayout
                         style="@style/Widget.MaterialComponents.AppBarLayout.PrimarySurface"
                         android:layout_width="40dp"
                         android:layout_height="40dp"
                         android:layout_gravity="center"
                         android:fitsSystemWindows="true">
-
                         <com.google.android.material.appbar.MaterialToolbar
                             android:id="@+id/topAppBar"
                             style="@style/Widget.MaterialComponents.Toolbar.PrimarySurface"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
                             android:background="@android:color/transparent"
                             android:elevation="0dp"
                             android:visibility="visible"
-                            app:navigationIcon="@drawable/iv_downside_arrow"
-                            app:title="Top app bar" />
+                            android:foreground="@color/transparent"
+                            app:navigationIcon="@color/transparent"
+                            app:title="Top app bar" >
+                            <ImageView
+                                android:id="@+id/iv_hamburger_menu"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:layout_marginEnd="0dp"
+                                android:layout_gravity="end"
+                                android:src="@drawable/iv_burger_menu"/>
+                        </com.google.android.material.appbar.MaterialToolbar>
                     </com.google.android.material.appbar.AppBarLayout>
 
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
+                        android:layout_gravity="center"
                         android:layout_weight="1">
 
                         <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
                             android:autoSizeMaxTextSize="18dp"
                             android:autoSizeMinTextSize="10dp"
                             android:autoSizeTextType="uniform"
+                            android:textAlignment="center"
                             android:maxLines="1"
                             android:text="@string/hello_name"
                             android:textSize="18dp"
@@ -260,7 +260,7 @@
                                         <ImageView
                                             android:layout_width="30dp"
                                             android:layout_height="30dp"
-                                            android:src="@drawable/iv_upside_green_arrow" />
+                                            android:src="@drawable/iv_red_up_arrow" />
                                     </LinearLayout>
                                 </LinearLayout>
                             </androidx.cardview.widget.CardView>
@@ -349,7 +349,7 @@
                                         <ImageView
                                             android:layout_width="30dp"
                                             android:layout_height="30dp"
-                                            android:src="@drawable/iv_downside_arrow" />
+                                            android:src="@drawable/iv_green_down_arrow" />
                                     </LinearLayout>
                                 </LinearLayout>
                             </androidx.cardview.widget.CardView>

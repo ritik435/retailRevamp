@@ -69,7 +69,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_gravity="center"
-                    android:src="@drawable/iv_upside_green_arrow" />
+                    android:src="@drawable/iv_green_down_arrow" />
 
 
                 <ImageView
@@ -176,7 +176,7 @@
                     android:layout_height="20dp"
                     android:layout_gravity="center"
                     android:layout_marginLeft="5dp"
-                    android:src="@drawable/iv_upside_green_arrow" />
+                    android:src="@drawable/iv_green_down_arrow" />
             </LinearLayout>
 
                 <LinearLayout

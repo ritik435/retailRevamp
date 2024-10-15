@@ -6,37 +6,42 @@
         <item
             android:title="@string/create_khata"
             android:id="@+id/create_khata"
-            android:icon="@drawable/iv_back_btn_black">
+            android:icon="@drawable/iv_create_khata">
         </item>
         <item
             android:title="@string/view_all_khata"
             android:id="@+id/view_all_khata"
-            android:icon="@drawable/iv_back_btn_black">
+            android:icon="@drawable/iv_view_all_khata">
         </item>
         <item
             android:title="@string/view_all_transaction"
             android:id="@+id/view_all_transaction"
-            android:icon="@drawable/iv_back_btn_black">
+            android:icon="@drawable/iv_view_all_transactions">
         </item>
         <item
             android:title="@string/back_up_on_account"
             android:id="@+id/back_up_on_account"
-            android:icon="@drawable/iv_back_btn_black">
+            android:icon="@drawable/iv_back_up_on_account">
+        </item>
+        <item
+            android:title="@string/upload_on_excel"
+            android:id="@+id/upload_on_excel"
+            android:icon="@drawable/iv_upload_on_excel">
         </item>
         <item
             android:title="@string/transfer_all_data"
             android:id="@+id/transfer_all_data"
-            android:icon="@drawable/iv_back_btn_black">
+            android:icon="@drawable/iv_transfer_all_data">
         </item>
         <item
             android:title="@string/erase_all_data"
             android:id="@+id/erase_all_data"
-            android:icon="@drawable/iv_back_btn_black">
+            android:icon="@drawable/iv_erase_all_data">
         </item>
         <item
             android:title="@string/logout"
             android:id="@+id/logout"
-            android:icon="@drawable/iv_back_btn_black">
+            android:icon="@drawable/iv_logout">
         </item>
     </group>
 

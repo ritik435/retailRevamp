@@ -25,6 +25,8 @@
     <string name="current_language">English</string>
     <string name="login">Login</string>
     <string name="sign_up">Sign Up</string>
+    <string name="enter_your_name">Enter your name</string>
+    <string name="business_name">Enter your business name</string>
     <string name="user_name">Add your userName</string>
     <string name="user_email">Add your email</string>
     <string name="user_password">Password</string>
@@ -48,6 +50,7 @@
     <string name="view_details">View details</string>
     <string name="view_all_transaction">View All transaction</string>
     <string name="back_up_on_account">Back up on account</string>
+    <string name="upload_on_excel">Upload on Excel</string>
     <string name="transfer_all_data">Transfer All data</string>
     <string name="erase_all_data">Erase All data</string>
     <string name="logout">Logout</string>

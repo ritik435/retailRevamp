@@ -69,6 +69,19 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         }else {
             holder.llMainTransaction.setVisibility(View.VISIBLE);
             holder.llDateOfTransaction.setVisibility(View.GONE);
+            if (transactionModel.getTransaction().equals(Tags.KEY_ADD_PAYMENTS)){
+
+                holder.ivPaymentType.setImageResource(R.drawable.iv_red_up_arrow);
+                holder.ivPaymentType2.setImageResource(R.drawable.iv_red_up_arrow);
+            }else if (transactionModel.getTransaction().equals(Tags.KEY_ADD_COLLECTION)){
+
+                holder.ivPaymentType.setImageResource(R.drawable.iv_green_down_arrow);
+                holder.ivPaymentType2.setImageResource(R.drawable.iv_green_down_arrow);
+            }else if (transactionModel.getTransaction().equals(Tags.KEY_ADD_ENTRY_IN_KHATA)){
+                //if no item taken then and only paid then green
+                //if  item taken then and not paid then red
+                //if  item taken then and  paid then khata transaction green/red new icon
+            }
 
             holder.txtUserName.setText(transactionModel.getUserName());
             String paymentBalance = String.valueOf(Math.abs(transactionModel.getBalance()));
@@ -121,7 +134,7 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
     public class TransactionViewHolder extends RecyclerView.ViewHolder {
         LinearLayout llDateOfTransaction,llMainTransaction,llBalance;
         TextView txtDate,txtTime,txtUserName,txtPaymentBalance,txtAmountTransferred,txtHeaderDate,txtPrefixBalance,txtSufixBalance;
-        ImageView ivPaymentMode, ivPaymentType;
+        ImageView ivPaymentMode, ivPaymentType,ivPaymentType2;
         public TransactionViewHolder(@NonNull View itemView) {
             super(itemView);
             llDateOfTransaction=itemView.findViewById(R.id.ll_date_of_transaction);
@@ -134,6 +147,7 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
             txtSufixBalance=itemView.findViewById(R.id.txt_sufix_balance);
             txtAmountTransferred=itemView.findViewById(R.id.txt_amount_transferred);
             ivPaymentType=itemView.findViewById(R.id.iv_payment_type);
+            ivPaymentType2=itemView.findViewById(R.id.iv_payment_type_2);
             ivPaymentMode=itemView.findViewById(R.id.iv_payment_mode);
             txtHeaderDate=itemView.findViewById(R.id.txt_header_date);
             llBalance=itemView.findViewById(R.id.ll_balance);

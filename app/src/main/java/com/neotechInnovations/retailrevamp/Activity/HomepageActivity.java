@@ -13,6 +13,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -515,6 +516,13 @@ public class HomepageActivity extends AppCompatActivity {
                 retrieveDataFromLocal();
             } else if (item.getItemId() == R.id.transfer_all_data) {
                 retrieveFromSheet();
+            } else if (item.getItemId() == R.id.upload_on_excel) {
+                calcAllStatsInfo();
+//                    initialiseStatsInfoRecyclerView();
+                Log.d(TAG, "onTouch: hmStatsInfo.get(\"28 April 24\") : " + hmStatsInfo.get("28 April 24"));
+
+                //save data in sheets
+                saveDataInSheets();
             }
             nvSidebarMenu.setVisibility(View.GONE);
             drawerLayout.closeDrawer(GravityCompat.START);
@@ -844,6 +852,7 @@ public class HomepageActivity extends AppCompatActivity {
             @Override
             public void onSheetCreated(String sheetLink) {
                 Log.d(TAG, "onSheetCreated: sheet is GoogleSheetsManager : created : ---- " + sheetLink);
+                Toast.makeText(getApplicationContext(),sheetLink,Toast.LENGTH_LONG).show();
                 spreadsheetLink = sheetLink;
             }
 

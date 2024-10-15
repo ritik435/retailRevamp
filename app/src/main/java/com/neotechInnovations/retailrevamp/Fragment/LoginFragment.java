@@ -1,9 +1,6 @@
 package com.neotechInnovations.retailrevamp.Fragment;
 
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +8,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import androidx.fragment.app.Fragment;
 
 import com.neotechInnovations.retailrevamp.Activity.HomepageActivity;
 import com.neotechInnovations.retailrevamp.Constant.Tags;
@@ -81,17 +80,17 @@ public class LoginFragment extends Fragment {
 
     private void initialiseViews(View view) {
         btnLogin=view.findViewById(R.id.btn_login);
-        btnSignUp=view.findViewById(R.id.btn_sign_up);
+        btnSignUp=view.findViewById(R.id.btn_signup);
         etLoginUserName=view.findViewById(R.id.et_login_user_name);
         etLoginUserPassword=view.findViewById(R.id.et_login_user_password);
-        etSignUpUserName=view.findViewById(R.id.et_signup_user_name);
-        etSignUpUserEmail=view.findViewById(R.id.et_signup_user_email);
+        etSignUpUserName=view.findViewById(R.id.et_signup_name);
+        etSignUpUserEmail=view.findViewById(R.id.et_signup_email);
         etSignUpUserPassword=view.findViewById(R.id.et_signup_user_password);
         etSignUpUserConfirmPassword=view.findViewById(R.id.et_signup_user_confirm_password);
-        txtLogin=view.findViewById(R.id.txt_login);
-        txtSignUp=view.findViewById(R.id.txt_sign_up);
+        txtLogin=view.findViewById(R.id.txt_login_in_signup);
+        txtSignUp=view.findViewById(R.id.txt_signup_in_login);
         llLoginContainer=view.findViewById(R.id.ll_login_container);
-        llSignUpContainer=view.findViewById(R.id.ll_sign_up_container);
+        llSignUpContainer=view.findViewById(R.id.ll_signup_container);
     }
 
     private void manipulateViews() {
@@ -114,19 +113,19 @@ public class LoginFragment extends Fragment {
         if(containerName.equals(Tags.STRING_LOGIN_CONTAINER)){
             llSignUpContainer.setVisibility(View.GONE);
             llLoginContainer.setVisibility(View.VISIBLE);
-            txtLogin.setBackgroundColor(getResources().getColor(R.color.black));
-            txtLogin.setTextColor(getResources().getColor(R.color.white));
-            txtSignUp.setBackgroundColor(getResources().getColor(R.color.white));
-            txtSignUp.setTextColor(getResources().getColor(R.color.black));
+//            txtLogin.setBackgroundColor(getResources().getColor(R.color.black));
+//            txtLogin.setTextColor(getResources().getColor(R.color.white));
+//            txtSignUp.setBackgroundColor(getResources().getColor(R.color.white));
+//            txtSignUp.setTextColor(getResources().getColor(R.color.black));
         }
         else if(containerName.equals(Tags.STRING_SIGNUP_CONTAINER)){
 
             llSignUpContainer.setVisibility(View.VISIBLE);
             llLoginContainer.setVisibility(View.GONE);
-            txtLogin.setBackgroundColor(getResources().getColor(R.color.white));
-            txtLogin.setTextColor(getResources().getColor(R.color.black));
-            txtSignUp.setBackgroundColor(getResources().getColor(R.color.black));
-            txtSignUp.setTextColor(getResources().getColor(R.color.white));
+//            txtLogin.setBackgroundColor(getResources().getColor(R.color.white));
+//            txtLogin.setTextColor(getResources().getColor(R.color.black));
+//            txtSignUp.setBackgroundColor(getResources().getColor(R.color.black));
+//            txtSignUp.setTextColor(getResources().getColor(R.color.white));
         }
     }
 }
