@@ -69,18 +69,25 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         }else {
             holder.llMainTransaction.setVisibility(View.VISIBLE);
             holder.llDateOfTransaction.setVisibility(View.GONE);
-            if (transactionModel.getTransaction().equals(Tags.KEY_ADD_PAYMENTS)){
+            Log.d(TAG, "onBindViewHolder: getTransaction :: "+transactionModel.getTransaction()+" : "+transactionModel.getPaymentType() + " key: "+transactionModel.getKey());
+            if (transactionModel.getKey().equals(Tags.KEY_ADD_PAYMENTS)){
 
                 holder.ivPaymentType.setImageResource(R.drawable.iv_red_up_arrow);
                 holder.ivPaymentType2.setImageResource(R.drawable.iv_red_up_arrow);
-            }else if (transactionModel.getTransaction().equals(Tags.KEY_ADD_COLLECTION)){
+            }else if (transactionModel.getKey().equals(Tags.KEY_ADD_COLLECTION)){
 
                 holder.ivPaymentType.setImageResource(R.drawable.iv_green_down_arrow);
                 holder.ivPaymentType2.setImageResource(R.drawable.iv_green_down_arrow);
-            }else if (transactionModel.getTransaction().equals(Tags.KEY_ADD_ENTRY_IN_KHATA)){
-                //if no item taken then and only paid then green
-                //if  item taken then and not paid then red
+            }else if (transactionModel.getKey().equals(Tags.KEY_ADD_ENTRY_IN_KHATA)){
+                 if (transactionModel.getPaymentType().equals(Tags.KEY_DEBIT)){
+                    holder.ivPaymentType.setImageResource(R.drawable.iv_red_up_arrow);
+                    holder.ivPaymentType2.setImageResource(R.drawable.iv_red_up_arrow);
+                }
                 //if  item taken then and  paid then khata transaction green/red new icon
+                else if (transactionModel.getPaymentType().equals(Tags.KEY_CREDIT)){
+                    holder.ivPaymentType.setImageResource(R.drawable.iv_green_down_arrow);
+                    holder.ivPaymentType2.setImageResource(R.drawable.iv_green_down_arrow);
+                }
             }
 
             holder.txtUserName.setText(transactionModel.getUserName());

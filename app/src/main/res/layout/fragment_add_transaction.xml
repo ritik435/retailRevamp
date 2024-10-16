@@ -158,15 +158,17 @@
                                         android:id="@+id/iv_payment_offline"
                                         android:layout_width="0dp"
                                         android:layout_height="match_parent"
+                                        android:background="@color/decreasing_red"
                                         android:layout_weight="1"
-                                        android:src="@color/decreasing_red" />
+                                        android:src="@drawable/iv_cash"/>
 
                                     <ImageView
                                         android:id="@+id/iv_payment_online"
                                         android:layout_width="0dp"
                                         android:layout_height="match_parent"
+                                        android:background="@color/increasing_green"
                                         android:layout_weight="1"
-                                        android:src="@color/increasing_green" />
+                                        android:src="@drawable/iv_online2_32" />
                                 </LinearLayout>
 
                                 <LinearLayout
@@ -181,8 +183,9 @@
                                         android:id="@+id/iv_payment_cheque"
                                         android:layout_width="0dp"
                                         android:layout_height="match_parent"
+                                        android:background="@color/grey"
                                         android:layout_weight="1"
-                                        android:src="@color/grey" />
+                                        android:src="@drawable/iv_cheque_32" />
 
                                 </LinearLayout>
 
@@ -195,15 +198,21 @@
                                 android:layout_gravity="center"
                                 android:layout_marginLeft="10dp"
                                 android:layout_marginRight="5dp"
-                                android:background="@drawable/background_tansaction_boundary"
                                 android:gravity="center"
                                 android:orientation="horizontal">
-
+                                <ImageView
+                                    android:id="@+id/iv_enter_payment"
+                                    android:layout_width="0dp"
+                                    android:layout_height="match_parent"
+                                    android:layout_margin="2dp"
+                                    android:layout_weight="1"
+                                    android:src="@drawable/iv_enter_64"/>
                                 <TextView
                                     android:id="@+id/txt_enter"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="@string/enter"
+                                    android:visibility="gone"
                                     android:textColor="?colorSecondary"
                                     android:textSize="12dp" />
                             </LinearLayout>
@@ -297,15 +306,22 @@
                                 android:layout_gravity="center"
                                 android:layout_marginLeft="10dp"
                                 android:layout_marginRight="5dp"
-                                android:background="@drawable/background_tansaction_boundary"
                                 android:gravity="center"
                                 android:orientation="horizontal">
 
+                                <ImageView
+                                    android:id="@+id/iv_enter_sales"
+                                    android:layout_width="0dp"
+                                    android:layout_height="match_parent"
+                                    android:layout_margin="1dp"
+                                    android:layout_weight="1"
+                                    android:src="@drawable/iv_enter_64"/>
                                 <TextView
                                     android:id="@+id/txt_enter_sales"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="@string/enter"
+                                    android:visibility="gone"
                                     android:textColor="?colorSecondary"
                                     android:textSize="12dp" />
                             </LinearLayout>
@@ -436,16 +452,16 @@
                                         android:layout_width="20dp"
                                         android:layout_height="20dp"
                                         android:layout_marginRight="10dp"
-                                        android:src="@drawable/iv_upside_green_arrow"
-                                        android:visibility="visible" />
+                                        android:src="@drawable/iv_checked_30"
+                                        android:visibility="gone" />
 
                                     <ImageView
                                         android:id="@+id/iv_un_checked"
                                         android:layout_width="20dp"
                                         android:layout_height="20dp"
                                         android:layout_margin="2dp"
-                                        android:visibility="gone"
-                                        android:src="@drawable/iv_downside_arrow" />
+                                        android:visibility="visible"
+                                        android:src="@drawable/iv_unchecked_32" />
 
                                     <TextView
                                         style="@style/textSubscript"
@@ -466,16 +482,23 @@
                                 android:layout_gravity="center"
                                 android:layout_marginLeft="10dp"
                                 android:layout_marginRight="5dp"
-                                android:background="@drawable/background_tansaction_boundary"
                                 android:gravity="center"
                                 android:minHeight="40dp"
                                 android:orientation="horizontal">
 
+                                <ImageView
+                                    android:id="@+id/iv_enter_collection"
+                                    android:layout_width="0dp"
+                                    android:layout_height="match_parent"
+                                    android:layout_margin="2dp"
+                                    android:layout_weight="1"
+                                    android:src="@drawable/iv_enter_64"/>
                                 <TextView
                                     android:id="@+id/txt_enter_collection"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="@string/enter"
+                                    android:visibility="gone"
                                     android:textColor="?colorSecondary"
                                     android:textSize="12dp" />
                             </LinearLayout>
@@ -583,16 +606,23 @@
                                     android:layout_gravity="center"
                                     android:layout_marginLeft="10dp"
                                     android:layout_marginRight="5dp"
-                                    android:background="@drawable/background_tansaction_boundary"
                                     android:gravity="center"
                                     android:minHeight="40dp"
                                     android:orientation="horizontal">
 
+                                    <ImageView
+                                        android:id="@+id/iv_enter_khata"
+                                        android:layout_width="0dp"
+                                        android:layout_height="match_parent"
+                                        android:layout_margin="2dp"
+                                        android:layout_weight="1"
+                                        android:src="@drawable/iv_enter_64"/>
                                     <TextView
                                         android:id="@+id/txt_enter_khata"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="@string/enter"
+                                        android:visibility="gone"
                                         android:textColor="?colorSecondary"
                                         android:textSize="12dp" />
                                 </LinearLayout>

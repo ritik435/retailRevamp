@@ -12,6 +12,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -75,18 +76,18 @@ public class StatsticsInfoAdapter extends RecyclerView.Adapter<StatsticsInfoAdap
             String currentDateString = dateFormat.format(currentDate);
             Log.d(TAG, "onTouch1: "+dailyPickerDate + " :: "+currentDate);
             if (dailyPickerDateString.equals(currentDateString)){
-                holder.ivNextDate.setVisibility(View.GONE);
+                holder.llNextDate.setVisibility(View.GONE);
             }else {
-                holder.ivNextDate.setVisibility(View.VISIBLE);
+                holder.llNextDate.setVisibility(View.VISIBLE);
             }
 
-            holder.ivPreviousDate.setOnTouchListener(new View.OnTouchListener() {
+            holder.llPreviousDate.setOnTouchListener(new View.OnTouchListener() {
                 @Override
                 public boolean onTouch(View view, MotionEvent motionEvent) {
                     if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                        holder.ivPreviousDate.setAlpha(0.5f);
+                        holder.llPreviousDate.setAlpha(0.5f);
                     } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
-                        holder.ivPreviousDate.setAlpha(1f);
+                        holder.llPreviousDate.setAlpha(1f);
                         // Create a Calendar instance and set it to the timestamp
                         Calendar calendar = Calendar.getInstance();
                         calendar.setTimeInMillis(dailyPickerDate.getTime());
@@ -106,21 +107,21 @@ public class StatsticsInfoAdapter extends RecyclerView.Adapter<StatsticsInfoAdap
 
                         Log.d(TAG, "onTouch2: "+dailyPickerDate + " :: "+currentDate);
                         if (dailyPickerDateString.equals(currentDateString)){
-                            holder.ivNextDate.setVisibility(View.GONE);
+                            holder.llNextDate.setVisibility(View.GONE);
                         }else {
-                            holder.ivNextDate.setVisibility(View.VISIBLE);
+                            holder.llNextDate.setVisibility(View.VISIBLE);
                         }
                     }
                     return true;
                 }
             });
-            holder.ivNextDate.setOnTouchListener(new View.OnTouchListener() {
+            holder.llNextDate.setOnTouchListener(new View.OnTouchListener() {
                 @Override
                 public boolean onTouch(View view, MotionEvent motionEvent) {
                     if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                        holder.ivNextDate.setAlpha(0.5f);
+                        holder.llNextDate.setAlpha(0.5f);
                     } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
-                        holder.ivNextDate.setAlpha(1f);
+                        holder.llNextDate.setAlpha(1f);
 
                         // Create a Calendar instance and set it to the timestamp
                         Calendar calendar = Calendar.getInstance();
@@ -141,9 +142,9 @@ public class StatsticsInfoAdapter extends RecyclerView.Adapter<StatsticsInfoAdap
 
                         Log.d(TAG, "onTouch3: "+dailyPickerDate + " :: "+currentDate);
                         if (dailyPickerDateString.equals(currentDateString)){
-                            holder.ivNextDate.setVisibility(View.GONE);
+                            holder.llNextDate.setVisibility(View.GONE);
                         }else {
-                            holder.ivNextDate.setVisibility(View.VISIBLE);
+                            holder.llNextDate.setVisibility(View.VISIBLE);
                         }
                     }
                     return true;
@@ -178,9 +179,9 @@ public class StatsticsInfoAdapter extends RecyclerView.Adapter<StatsticsInfoAdap
             String currentDateString = dateFormat.format(currentDate);
 
             if (monthlyEndPickerDateString.equals(currentDateString)){
-                holder.ivNextDate.setVisibility(View.GONE);
+                holder.llNextDate.setVisibility(View.GONE);
             }else{
-                holder.ivNextDate.setVisibility(View.VISIBLE);
+                holder.llNextDate.setVisibility(View.VISIBLE);
             }
 
             List<String> stats=calculateSales(monthlyStartPickerDate, monthlyEndPickerDate);
@@ -197,13 +198,13 @@ public class StatsticsInfoAdapter extends RecyclerView.Adapter<StatsticsInfoAdap
 
             holder.txtRange.setText(sbPickerDate);
 
-            holder.ivPreviousDate.setOnTouchListener(new View.OnTouchListener() {
+            holder.llPreviousDate.setOnTouchListener(new View.OnTouchListener() {
                 @Override
                 public boolean onTouch(View view, MotionEvent motionEvent) {
                     if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                        holder.ivPreviousDate.setAlpha(0.5f);
+                        holder.llPreviousDate.setAlpha(0.5f);
                     } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
-                        holder.ivPreviousDate.setAlpha(1f);
+                        holder.llPreviousDate.setAlpha(1f);
 
                         // Create a Calendar instance and set it to the timestamp
                         Calendar calendar = Calendar.getInstance();
@@ -231,9 +232,9 @@ public class StatsticsInfoAdapter extends RecyclerView.Adapter<StatsticsInfoAdap
                         String currentDateString = dateFormat.format(currentDate);
 
                         if (monthlyEndPickerDateString.equals(currentDateString)){
-                            holder.ivNextDate.setVisibility(View.GONE);
+                            holder.llNextDate.setVisibility(View.GONE);
                         }else{
-                            holder.ivNextDate.setVisibility(View.VISIBLE);
+                            holder.llNextDate.setVisibility(View.VISIBLE);
                         }
 
 
@@ -256,13 +257,13 @@ public class StatsticsInfoAdapter extends RecyclerView.Adapter<StatsticsInfoAdap
                     return true;
                 }
             });
-            holder.ivNextDate.setOnTouchListener(new View.OnTouchListener() {
+            holder.llNextDate.setOnTouchListener(new View.OnTouchListener() {
                 @Override
                 public boolean onTouch(View view, MotionEvent motionEvent) {
                     if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                        holder.ivNextDate.setAlpha(0.5f);
+                        holder.llNextDate.setAlpha(0.5f);
                     } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
-                        holder.ivNextDate.setAlpha(1f);
+                        holder.llNextDate.setAlpha(1f);
 
 
                         // Create a Calendar instance and set it to the timestamp
@@ -294,9 +295,9 @@ public class StatsticsInfoAdapter extends RecyclerView.Adapter<StatsticsInfoAdap
                         }
 
                         if (monthlyEndPickerDateString.equals(currentDateString)){
-                            holder.ivNextDate.setVisibility(View.GONE);
+                            holder.llNextDate.setVisibility(View.GONE);
                         }else{
-                            holder.ivNextDate.setVisibility(View.VISIBLE);
+                            holder.llNextDate.setVisibility(View.VISIBLE);
                         }
 
 
@@ -327,8 +328,8 @@ public class StatsticsInfoAdapter extends RecyclerView.Adapter<StatsticsInfoAdap
             holder.txtStatsTitle.setText(Tags.STRING_CUSTOM_STATS);
             holder.txtTotalSales.setText("10000");
             holder.txtBottomline.setText("1000");
-            holder.ivPreviousDate.setVisibility(View.GONE);
-            holder.ivNextDate.setVisibility(View.GONE);
+            holder.llPreviousDate.setVisibility(View.GONE);
+            holder.llNextDate.setVisibility(View.GONE);
         }
     }
 
@@ -340,6 +341,7 @@ public class StatsticsInfoAdapter extends RecyclerView.Adapter<StatsticsInfoAdap
     public static class StatsticsInfoViewHolder extends RecyclerView.ViewHolder {
         public TextView txtStatsTitle, txtTotalSales, txtBottomline,txtRange;
         public ImageView ivPreviousDate, ivNextDate;
+        LinearLayout llPreviousDate, llNextDate;
 
         public StatsticsInfoViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -347,7 +349,9 @@ public class StatsticsInfoAdapter extends RecyclerView.Adapter<StatsticsInfoAdap
             txtBottomline = itemView.findViewById(R.id.txt_bottomline);
             txtTotalSales = itemView.findViewById(R.id.txt_total_sales);
             ivPreviousDate = itemView.findViewById(R.id.iv_previous_date);
+            llPreviousDate = itemView.findViewById(R.id.ll_previous_date);
             ivNextDate = itemView.findViewById(R.id.iv_next_date);
+            llNextDate = itemView.findViewById(R.id.ll_next_date);
             txtRange = itemView.findViewById(R.id.txt_range);
 
         }
