@@ -28,13 +28,13 @@
 
             <TextView
                 android:id="@+id/txt_create_heading"
+                style="@style/textSubHeading"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginLeft="20dp"
                 android:text="@string/create_khata"
-                android:textColor="@color/black"
-                style="@style/textSubHeading"/>
+                android:textColor="@color/black" />
 
         </LinearLayout>
 
@@ -54,20 +54,23 @@
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="20dp"
                     android:background="@color/black_10"
-                    android:visibility="visible"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:visibility="visible">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginHorizontal="20dp"
                         android:orientation="vertical">
+                        <RelativeLayout
+                            android:layout_width="80dp"
+                            android:layout_height="80dp"
+                            android:layout_gravity="center"
+                            android:layout_marginVertical="20dp">
 
                         <androidx.cardview.widget.CardView
                             android:layout_width="80dp"
                             android:layout_height="80dp"
-                            android:layout_gravity="center"
-                            android:layout_marginVertical="20dp"
                             android:background="@color/white"
                             android:backgroundTint="@color/white"
                             app:cardCornerRadius="40dp">
@@ -76,16 +79,35 @@
                                 android:id="@+id/iv_khata_user_image"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:layout_margin="2dp"
-                                android:src="@drawable/iv_upside_green_arrow" />
+                                android:layout_margin="5dp"
+                                android:src="@drawable/iv_blank_user" />
+
                         </androidx.cardview.widget.CardView>
 
+                            <androidx.cardview.widget.CardView
+                                android:layout_width="30dp"
+                                android:layout_height="30dp"
+                                android:layout_alignParentBottom="true"
+                                android:layout_alignParentEnd="true"
+                                android:background="@color/white"
+                                android:visibility="gone"
+                                android:backgroundTint="@color/white"
+                                app:cardCornerRadius="40dp">
+
+                                <ImageView
+                                    android:id="@+id/iv_khata_edit_user_image"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:layout_margin="5dp"
+                                    android:src="@drawable/iv_camera_32" />
+                            </androidx.cardview.widget.CardView>
+                        </RelativeLayout>
                         <TextView
+                            style="@style/textSubHeading"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/name"
-                            android:textColor="?colorOnPrimary"
-                            style="@style/textSubHeading" />
+                            android:textColor="?colorOnPrimary" />
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -100,53 +122,53 @@
                                 android:orientation="horizontal">
 
                                 <TextView
+                                    style="@style/textSubHeading"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="#"
-                                    android:textColor="?colorOnPrimary"
-                                    style="@style/textSubHeading" />
+                                    android:textColor="?colorOnPrimary" />
 
                                 <TextView
                                     android:id="@+id/txt_khata_serial_number"
+                                    style="@style/textSubHeading"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="2"
-                                    android:textColor="?colorOnPrimary"
-                                    style="@style/textSubHeading" />
+                                    android:textColor="?colorOnPrimary" />
                             </LinearLayout>
 
                             <EditText
                                 android:id="@+id/et_khata_user_name"
+                                style="@style/textBold"
                                 android:layout_width="match_parent"
-                                android:layout_height="30dp"
+                                android:layout_height="40dp"
                                 android:layout_marginHorizontal="10dp"
                                 android:background="@drawable/background_language_boundary"
                                 android:hint="@string/write_name_of_khata"
                                 android:paddingHorizontal="5dp"
-                                android:textColorHint="?colorPrimaryVariant"
                                 android:paddingLeft="5dp"
-                                style="@style/textBold"/>
+                                android:textColorHint="?colorPrimaryVariant" />
                         </LinearLayout>
 
                         <TextView
+                            style="@style/textSubHeading"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="30dp"
                             android:text="@string/phone_number"
-                            android:textColor="?colorOnPrimary"
-                            style="@style/textSubHeading" />
+                            android:textColor="?colorOnPrimary" />
 
                         <EditText
                             android:id="@+id/et_khata_user_phone_number"
+                            style="@style/textBold"
                             android:layout_width="match_parent"
-                            android:layout_height="30dp"
+                            android:layout_height="40dp"
                             android:layout_marginHorizontal="10dp"
                             android:background="@drawable/background_language_boundary"
                             android:hint="@string/mention_phone"
                             android:inputType="number"
                             android:paddingLeft="10dp"
-                            android:textColorHint="?colorPrimaryVariant"
-                            style="@style/textBold"/>
+                            android:textColorHint="?colorPrimaryVariant" />
 
                         <androidx.cardview.widget.CardView
                             android:id="@+id/cv_create_khata"
@@ -159,14 +181,14 @@
                             app:cardCornerRadius="10dp">
 
                             <TextView
+                                style="@style/textBold"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center"
                                 android:layout_marginLeft="20dp"
                                 android:layout_marginRight="40dp"
                                 android:text="@string/create_khata"
-                                android:textColor="@color/black"
-                                style="@style/textBold" />
+                                android:textColor="@color/black" />
 
                             <ImageView
                                 android:layout_width="20dp"
@@ -215,8 +237,8 @@
                             android:layout_marginRight="10dp"
                             android:onClick="onClick"
                             android:text="@string/view_all"
-                            android:visibility="gone"
-                            android:textColor="?colorSecondary" />
+                            android:textColor="?colorSecondary"
+                            android:visibility="gone" />
                     </LinearLayout>
 
                     <androidx.recyclerview.widget.RecyclerView

@@ -510,7 +510,9 @@ public class HomepageActivity extends AppCompatActivity {
             } else if (item.getItemId() == R.id.erase_all_data) {
                 Log.d(TAG, "NavClick: 5");
                 SharedPreference.clearLists();
+                SharedPreference.clearNewKhataList();
                 hmStatsInfo.clear();
+                newKhataList.clear();
                 statsticsInfoAdapter.hmStatsInfo = hmStatsInfo;
                 statsticsInfoAdapter.notifyDataSetChanged();
                 retrieveDataFromLocal();
@@ -867,6 +869,7 @@ public class HomepageActivity extends AppCompatActivity {
 
             @Override
             public void onSheetCreationFailed(Exception e) {
+                Toast.makeText(getApplicationContext(), "There is some issue creating excel sheet ", Toast.LENGTH_LONG).show();
                 Log.d(TAG, "onSheetCreationFailed: GoogleSheetsManager: " + e.getMessage());
                 e.printStackTrace();
             }
@@ -881,6 +884,8 @@ public class HomepageActivity extends AppCompatActivity {
         GoogleSheetsManager.retrieveDataFromGoogleSheets(spreadSheetId1, new GoogleSheetsManager.GoogleSheetsCallback() {
             @Override
             public void onSheetCreated(String sheetLink) {
+                String message = "Sheet has been created: " + sheetLink;
+                Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
                 Log.d(TAG, "onSheetCreated: sheet is GoogleSheetsManager : created : ---- " + sheetLink);
             }
 
@@ -898,6 +903,7 @@ public class HomepageActivity extends AppCompatActivity {
 
             @Override
             public void onSheetCreationFailed(Exception e) {
+                Toast.makeText(getApplicationContext(), "There is some issue creating excel sheet ", Toast.LENGTH_SHORT).show();
                 Log.d(TAG, "onSheetCreationFailed: GoogleSheetsManager: " + e.getMessage());
                 e.printStackTrace();
             }

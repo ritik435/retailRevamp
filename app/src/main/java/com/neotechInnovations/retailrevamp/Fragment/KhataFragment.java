@@ -146,19 +146,6 @@ public class KhataFragment extends Fragment {
         initialiseTransactionRecyclerView();
     }
     public void addElementsInRecents() {
-//        for (int i=0;i<60;i++){
-//            TransactionModel transactionModel=new TransactionModel();
-//            transactionModel.setMode("Online");
-//            transactionModel.setTotalAmount(30000);
-//            transactionModel.setTransaction(true);
-//            transactionModel.setKey(Tags.KEY_ADD_ENTRY_IN_KHATA);
-//            transactionModel.setPaymentType("Debit");
-//            transactionModel.setAmountTransferred(29900+i);
-//            String s= String.valueOf(Integer.valueOf(i));
-//            transactionModel.setUserName(s);
-//            transactionModel.setBalance(i+100);
-//            transactionModelList.add(transactionModel);
-//        }
         transactionModelList=new ArrayList<>();
         balance=0;
         for (int i=0;i<HomepageActivity.khataTransactionModelList.size();i++){

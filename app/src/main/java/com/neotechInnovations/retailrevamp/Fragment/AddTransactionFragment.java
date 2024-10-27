@@ -35,6 +35,7 @@ import com.neotechInnovations.retailrevamp.Constant.Tags;
 import com.neotechInnovations.retailrevamp.Model.KhataModel;
 import com.neotechInnovations.retailrevamp.Model.TransactionModel;
 import com.neotechInnovations.retailrevamp.R;
+import com.neotechInnovations.retailrevamp.Utils.SharedPreference;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -82,6 +83,7 @@ public class AddTransactionFragment extends Fragment {
     RadioButton radioButton, rbSalesOnline, rbSalesOffline, rbKhataEntryGiven, rbKhataEntryTaken, rbCollectionCash, rbCollectionOther, rbCollectionOnline;
     ImageView ivPaymentOffline, ivPaymentOnline, ivPaymentCheque;
     Boolean setAsInitial = false;
+    TextView txtClear;
 
     public AddTransactionFragment() {
         // Required empty public constructor
@@ -164,6 +166,7 @@ public class AddTransactionFragment extends Fragment {
         rbKhataEntryGiven = view.findViewById(R.id.rb_khata_entry_given);
         rbKhataEntryTaken = view.findViewById(R.id.rb_khata_entry_taken);
         rgCollection = view.findViewById(R.id.rg_collection);
+        txtClear = view.findViewById(R.id.txt_clear);
 //        radioButton.setButtonDrawable(R.drawable.background_manipulate_modes_debit);
 
         manipulateViews(view);
@@ -182,6 +185,12 @@ public class AddTransactionFragment extends Fragment {
         manipulateAddTransactionType();
         initialiseTransactionRecyclerView();
         initialiseSuggestedKhata();
+        txtClear.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                resetAddTransadtion();
+            }
+        });
         ivChecked.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -261,8 +270,8 @@ public class AddTransactionFragment extends Fragment {
                     if (inArea) {
                         llEnterEntryInKhata.setAlpha(1f);
                         Log.d(TAG, "onTouch: manipulateAddTransactionFragment : cvAddCollection to call ");
-                        String paymentType= Tags.KEY_CREDIT;
-                        if (rbKhataEntryGiven.isChecked()){
+                        String paymentType = Tags.KEY_CREDIT;
+                        if (rbKhataEntryGiven.isChecked()) {
                             paymentType = Tags.KEY_DEBIT;
                         } else if (rbKhataEntryTaken.isChecked()) {
                             paymentType = Tags.KEY_CREDIT;
@@ -509,17 +518,21 @@ public class AddTransactionFragment extends Fragment {
 
         transactionModelList.add(1, transactionModel);
         specificTransactionModelList.add(1, transactionModel);
-        if (keyAddTransaction.equals(Tags.KEY_ADD_ENTRY_IN_KHATA)){
-            for (int i=0;i<HomepageActivity.newKhataList.size();i++){
-                KhataModel khataModel=HomepageActivity.newKhataList.get(i);
-                if (khataModel.getKhataUserIdString().equals(transactionModel.getKhataNumber())){
-                    if (transactionModel.getMode().equals(Tags.KEY_DEBIT)){
-                        khataModel.setKhataBalance(khataModel.getKhataBalance()-transactionModel.getTotalAmount());
-                    }else if (transactionModel.getMode().equals(Tags.KEY_CREDIT)){
-                        khataModel.setKhataBalance(khataModel.getKhataBalance()+transactionModel.getTotalAmount());
+        if (keyAddTransaction.equals(Tags.KEY_ADD_ENTRY_IN_KHATA)) {
+            for (int i = 0; i < HomepageActivity.newKhataList.size(); i++) {
+                KhataModel khataModel = HomepageActivity.newKhataList.get(i);
+                if (khataModel.getKhataUserIdString().equals(transactionModel.getKhataNumber())) {
+                    Log.d(TAG, "addTransaction: Balance updated for : khataString : " + khataModel.getKhataUserIdString() +" MODE: "+transactionModel.getMode());
+                    if (transactionModel.getPaymentType().equals(Tags.KEY_DEBIT)) {
+                        khataModel.setKhataBalance(khataModel.getKhataBalance() - transactionModel.getTotalAmount());
+                    } else if (transactionModel.getPaymentType().equals(Tags.KEY_CREDIT)) {
+                        khataModel.setKhataBalance(khataModel.getKhataBalance() + transactionModel.getTotalAmount());
                     }
+                    Log.d(TAG, "addTransaction: Balance updated to : " + khataModel.getKhataBalance());
+                    HomepageActivity.newKhataList.set(i,khataModel);
                 }
             }
+            SharedPreference.savenNewKhataLists(HomepageActivity.newKhataList);
         }
 
         Log.d(TAG, "addTransaction: transaction added in transactionModelList: " + transactionModelList.size());
@@ -540,8 +553,8 @@ public class AddTransactionFragment extends Fragment {
         String totalAmount = etTotalAmountGeneric.getText().toString();
         String amountTransferred = etAmountTransferredGeneric.getText().toString();
         etUserNameGeneric.setHintTextColor(getResources().getColor(R.color.black));
-        if (keyAddTransaction.equals(Tags.KEY_ADD_COLLECTION)){
-            Log.d(TAG, "validAsTransaction: rbCollectionOnline.isChecked() : "+ rbCollectionOnline.isChecked()+" rbCollectionCash.isChecked() : "+rbCollectionCash.isChecked());
+        if (keyAddTransaction.equals(Tags.KEY_ADD_COLLECTION)) {
+            Log.d(TAG, "validAsTransaction: rbCollectionOnline.isChecked() : " + rbCollectionOnline.isChecked() + " rbCollectionCash.isChecked() : " + rbCollectionCash.isChecked());
             if (rbCollectionOnline.isChecked()) {
                 userName = rbCollectionOnline.getText().toString();
             } else if (rbCollectionCash.isChecked())

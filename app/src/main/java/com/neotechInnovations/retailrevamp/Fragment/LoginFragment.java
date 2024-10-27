@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -35,6 +36,7 @@ public class LoginFragment extends Fragment {
     EditText etLoginUserName,etLoginUserPassword, etSignUpUserName,etSignUpUserEmail, etSignUpUserPassword ,etSignUpUserConfirmPassword;
     Button btnLogin,btnSignUp;
     HomepageActivity activity;
+    ImageView ivBackBtn;
 
     public LoginFragment() {
         // Required empty public constructor
@@ -91,11 +93,18 @@ public class LoginFragment extends Fragment {
         txtSignUp=view.findViewById(R.id.txt_signup_in_login);
         llLoginContainer=view.findViewById(R.id.ll_login_container);
         llSignUpContainer=view.findViewById(R.id.ll_signup_container);
+        ivBackBtn=view.findViewById(R.id.iv_back_btn);
     }
 
     private void manipulateViews() {
         manipulateContainers(Tags.STRING_LOGIN_CONTAINER);
 
+        ivBackBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ((HomepageActivity)activity).onBackPressed();
+            }
+        });
         txtLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
