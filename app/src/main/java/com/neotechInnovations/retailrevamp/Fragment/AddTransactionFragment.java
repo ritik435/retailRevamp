@@ -562,23 +562,23 @@ public class AddTransactionFragment extends Fragment {
         }
         if (keyAddTransaction.equals(Tags.KEY_ADD_ENTRY_IN_KHATA) && !isValidKhata) {
             etUserNameGeneric.setText("");
-            etUserNameGeneric.setAnimation(shakeAnimation);
+            etUserNameGeneric.startAnimation(shakeAnimation);
             etUserNameGeneric.setHintTextColor(getResources().getColor(R.color.decreasing_red));
             return;
         }
         if (userName.equals("") || userName.equals("null")) {
-            etUserNameGeneric.setAnimation(shakeAnimation);
+            etUserNameGeneric.startAnimation(shakeAnimation);
             etUserNameGeneric.setHintTextColor(getResources().getColor(R.color.decreasing_red));
             return;
         }
         if (totalAmount.equals("") || totalAmount.equals("null")) {
             etTotalAmountGeneric.setHintTextColor(getResources().getColor(R.color.decreasing_red));
-            etTotalAmountGeneric.setAnimation(shakeAnimation);
+            etTotalAmountGeneric.startAnimation(shakeAnimation);
             return;
         }
         if (amountTransferred.equals("") || amountTransferred.equals("null")) {
             etAmountTransferredGeneric.setHintTextColor(getResources().getColor(R.color.decreasing_red));
-            etAmountTransferredGeneric.setAnimation(shakeAnimation);
+            etAmountTransferredGeneric.startAnimation(shakeAnimation);
             return;
         }
         Integer amountTransfer = Integer.valueOf(amountTransferred);

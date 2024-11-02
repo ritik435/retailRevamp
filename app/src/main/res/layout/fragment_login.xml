@@ -62,7 +62,7 @@
                     android:layout_height="200dp"
                     android:layout_alignParentTop="true"
                     android:layout_alignParentEnd="true"
-                    android:layout_marginTop="-30dp"
+                    android:layout_marginTop="-40dp"
                     android:layout_marginEnd="10dp"
                     android:alpha="0.7"
                     android:backgroundTint="@color/increasing_green"
@@ -117,6 +117,7 @@
                     android:visibility="gone">
 
                     <EditText
+                        style="@style/textLight"
                         android:id="@+id/et_login_user_name"
                         android:layout_width="match_parent"
                         android:layout_height="50dp"
@@ -126,15 +127,42 @@
                         android:paddingHorizontal="15dp"
                         android:paddingVertical="5dp" />
 
-                    <EditText
-                        android:id="@+id/et_login_user_password"
+                    <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="50dp"
-                        android:layout_marginTop="20dp"
-                        android:background="@drawable/background_login_black_boundary"
-                        android:hint="@string/user_password"
-                        android:paddingHorizontal="15dp"
-                        android:paddingVertical="5dp" />
+                        android:layout_marginTop="20dp">
+
+                        <EditText
+                            style="@style/textLight"
+                            android:id="@+id/et_login_user_password"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:background="@drawable/background_login_black_boundary"
+                            android:hint="@string/user_password"
+                            android:paddingVertical="5dp"
+                            android:paddingStart="15dp"
+                            android:paddingEnd="45dp" />
+
+                        <ImageView
+                            android:id="@+id/iv_hide_password"
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:layout_marginEnd="15dp"
+                            android:src="@drawable/iv_hide_password"
+                            android:visibility="visible" />
+
+                        <ImageView
+                            android:id="@+id/iv_show_password"
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:layout_marginEnd="15dp"
+                            android:src="@drawable/iv_show_password"
+                            android:visibility="gone" />
+                    </RelativeLayout>
 
                     <TextView
                         style="@style/textLight"
@@ -192,57 +220,98 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_marginTop="40dp"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:visibility="visible">
 
                     <EditText
+                        style="@style/textLight"
                         android:id="@+id/et_signup_name"
                         android:layout_width="match_parent"
                         android:layout_height="50dp"
                         android:layout_marginTop="10dp"
                         android:background="@drawable/background_login_black_boundary"
                         android:hint="@string/enter_name"
+                        android:inputType="text"
                         android:paddingHorizontal="15dp"
                         android:paddingVertical="5dp" />
 
                     <EditText
+                        style="@style/textLight"
                         android:id="@+id/et_signup_shop_name"
                         android:layout_width="match_parent"
                         android:layout_height="50dp"
                         android:layout_marginTop="20dp"
                         android:background="@drawable/background_login_black_boundary"
                         android:hint="@string/business_name"
+                        android:inputType="text"
                         android:paddingHorizontal="15dp"
                         android:paddingVertical="5dp" />
 
                     <EditText
+                        style="@style/textLight"
                         android:id="@+id/et_signup_email"
                         android:layout_width="match_parent"
                         android:layout_height="50dp"
                         android:layout_marginTop="20dp"
+                        android:inputType="text"
                         android:background="@drawable/background_login_black_boundary"
                         android:hint="@string/user_email"
                         android:paddingHorizontal="15dp"
                         android:paddingVertical="5dp" />
 
-                    <EditText
-                        android:id="@+id/et_signup_user_password"
+                    <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="50dp"
-                        android:layout_marginTop="20dp"
-                        android:background="@drawable/background_login_black_boundary"
-                        android:hint="@string/user_password"
-                        android:paddingHorizontal="15dp"
-                        android:paddingVertical="5dp" />
+                        android:layout_marginTop="20dp">
 
-                    <EditText
-                        android:id="@+id/et_signup_user_confirm_password"
+                        <EditText
+                            style="@style/textLight"
+                            android:id="@+id/et_signup_user_password"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:background="@drawable/background_login_black_boundary"
+                            android:hint="@string/user_password"
+                            android:inputType="textPassword"
+                            android:paddingHorizontal="15dp"
+                            android:paddingVertical="5dp" />
+                    </RelativeLayout>
+                    <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="50dp"
-                        android:layout_marginTop="20dp"
-                        android:background="@drawable/background_login_black_boundary"
-                        android:hint="@string/user_confirm_password"
-                        android:paddingHorizontal="15dp"
-                        android:paddingVertical="5dp" />
+                        android:layout_marginTop="20dp">
+
+                        <EditText
+                            style="@style/textLight"
+                            android:id="@+id/et_signup_user_confirm_password"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:background="@drawable/background_login_black_boundary"
+                            android:hint="@string/user_confirm_password"
+                            android:paddingHorizontal="15dp"
+                            android:inputType="textPassword"
+                            android:paddingVertical="5dp" />
+                        <ImageView
+                            android:id="@+id/iv_hide_confirm_password_signup"
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:layout_marginEnd="15dp"
+                            android:src="@drawable/iv_hide_password"
+                            android:visibility="visible" />
+
+                        <ImageView
+                            android:id="@+id/iv_show_confirm_password_signup"
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:layout_marginEnd="15dp"
+                            android:src="@drawable/iv_show_password"
+                            android:visibility="gone" />
+
+                    </RelativeLayout>
+
 
                     <androidx.cardview.widget.CardView
                         android:layout_width="match_parent"
@@ -257,6 +326,7 @@
                             android:layout_height="match_parent"
                             android:backgroundTint="@color/transparent"
                             android:text="@string/sign_up"
+                            style="@style/textSubHeading"
                             android:textColor="?colorPrimary" />
                     </androidx.cardview.widget.CardView>
 

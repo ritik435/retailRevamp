@@ -259,12 +259,12 @@ public class CreateKhataFragment extends Fragment {
 
         if (userName.equals("") || userName.equals("null")) {
             etKhataUserName.setHintTextColor(resolveColorAttribute(activity, com.google.android.material.R.attr.colorOnSurfaceInverse));
-            etKhataUserName.setAnimation(shakeAnimation);
+            etKhataUserName.startAnimation(shakeAnimation);
             return;
         }
         if (phoneNumber.equals("") || phoneNumber.equals("null")) {
             etKhataUserPhoneNumber.setHintTextColor(resolveColorAttribute(activity, com.google.android.material.R.attr.colorOnSurfaceInverse));
-            etKhataUserPhoneNumber.setAnimation(shakeAnimation);
+            etKhataUserPhoneNumber.startAnimation(shakeAnimation);
             return;
         }
         hideKeyboard(activity);
