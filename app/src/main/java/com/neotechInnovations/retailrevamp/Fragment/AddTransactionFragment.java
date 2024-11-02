@@ -538,6 +538,7 @@ public class AddTransactionFragment extends Fragment {
 
         Log.d(TAG, "addTransaction: transaction added in transactionModelList: " + transactionModelList.size());
         Toast.makeText(getActivity().getApplicationContext(),"Transaction Added",Toast.LENGTH_LONG ).show();
+
         Log.d(TAG, "addTransaction: transaction added in SPECIFICtransactionModelList: " + specificTransactionModelList.size());
         if (specificTransactionModelList.size() > 2) {
             transactionAdapter.notifyDataSetChanged();
