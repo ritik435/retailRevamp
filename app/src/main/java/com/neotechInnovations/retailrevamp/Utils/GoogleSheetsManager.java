@@ -62,7 +62,8 @@ public class GoogleSheetsManager {
 
 //        Drive driveService = getDriveService(accessToken);
         Log.d(TAG, "StatsPopulate: 1");
-        InputStream inputStream = context.getResources().openRawResource(R.raw.retail_service);
+//        InputStream inputStream = context.getResources().openRawResource(R.raw.retail_service);
+        InputStream inputStream = null;
         try {
             credential = GoogleCredential.fromStream(inputStream).createScoped(SCOPES);
         } catch (IOException e) {
