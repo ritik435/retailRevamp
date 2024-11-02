@@ -15,6 +15,24 @@ public class TransactionModel {
     String key;
     UUID khataId;
     String khataNumber;
+    boolean deleted;
+    boolean edited;
+
+    public boolean isEdited() {
+        return edited;
+    }
+
+    public void setEdited(boolean edited) {
+        this.edited = edited;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
 
     public String getKhataNumber() {
         return khataNumber;

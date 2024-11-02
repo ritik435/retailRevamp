@@ -30,6 +30,8 @@
         <string name="business_name">Enter your name</string>
         <string name="user_name">Add your userName</string>
         <string name="user_email">Add your email</string>
+        <string name="start_date">Start Date</string>
+        <string name="end_date">End Date</string>
         <string name="user_password">Password</string>
         <string name="user_confirm_password">Confirm Password</string>
         <string name="daily_stats">Daily Stats</string>

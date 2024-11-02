@@ -236,6 +236,7 @@
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
                                     android:gravity="center"
+                                    android:padding="5dp"
                                     android:orientation="vertical">
 
                                     <TextView
@@ -245,7 +246,7 @@
                                         android:text="@string/add_payments"
                                         android:textAlignment="center"
                                         android:textColor="?colorPrimary"
-                                        android:textSize="16dp" />
+                                        style="@style/textSubHeading" />
 
                                     <LinearLayout
                                         android:layout_width="wrap_content"
@@ -281,6 +282,7 @@
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
                                     android:gravity="center"
+                                    android:padding="5dp"
                                     android:orientation="vertical">
 
                                     <TextView
@@ -325,6 +327,7 @@
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
                                     android:gravity="center"
+                                    android:padding="5dp"
                                     android:orientation="vertical">
 
                                     <TextView
@@ -334,7 +337,7 @@
                                         android:text="@string/add_collection"
                                         android:textAlignment="center"
                                         android:textColor="?colorPrimary"
-                                        android:textSize="16dp" />
+                                        style="@style/textSubHeading"  />
 
                                     <LinearLayout
                                         android:layout_width="wrap_content"
@@ -369,6 +372,7 @@
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
                                     android:gravity="center"
+                                    android:padding="5dp"
                                     android:orientation="vertical">
 
                                     <TextView
@@ -378,7 +382,7 @@
                                         android:text="@string/add_Khata"
                                         android:textAlignment="center"
                                         android:textColor="?colorPrimary"
-                                        android:textSize="16dp" />
+                                        style="@style/textSubHeading"  />
 
                                     <LinearLayout
                                         android:layout_width="wrap_content"

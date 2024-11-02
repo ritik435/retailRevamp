@@ -41,7 +41,7 @@
         <LinearLayout
             android:id="@+id/ll_main_transaction"
             android:layout_width="match_parent"
-            android:layout_height="55dp"
+            android:layout_height="wrap_content"
             android:layout_marginVertical="5dp"
             android:orientation="horizontal"
             android:paddingVertical="5dp"
@@ -51,7 +51,7 @@
             <!--    date,time,name,bal,amound,mode,type-->
             <androidx.cardview.widget.CardView
                 android:layout_width="45dp"
-                android:layout_height="match_parent"
+                android:layout_height="45dp"
                 android:layout_marginLeft="15dp"
                 android:background="@drawable/background_tansaction_boundary"
                 android:orientation="vertical"
@@ -83,7 +83,7 @@
 
             <LinearLayout
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginLeft="5dp"
                 android:layout_weight="1"
                 android:orientation="vertical"
