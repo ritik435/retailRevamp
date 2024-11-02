@@ -23,6 +23,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -536,6 +537,8 @@ public class AddTransactionFragment extends Fragment {
         }
 
         Log.d(TAG, "addTransaction: transaction added in transactionModelList: " + transactionModelList.size());
+        Toast.makeText(getActivity().getApplicationContext(),"Transaction Added",Toast.LENGTH_LONG ).show();
+
         Log.d(TAG, "addTransaction: transaction added in SPECIFICtransactionModelList: " + specificTransactionModelList.size());
         if (specificTransactionModelList.size() > 2) {
             transactionAdapter.notifyDataSetChanged();
