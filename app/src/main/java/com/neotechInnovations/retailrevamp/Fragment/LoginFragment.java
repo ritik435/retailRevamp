@@ -2,6 +2,7 @@ package com.neotechInnovations.retailrevamp.Fragment;
 
 import android.os.Bundle;
 import android.text.InputType;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,14 +12,27 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
+import com.neotechInnovations.retailrevamp.API.ResponseListener;
+import com.neotechInnovations.retailrevamp.API.RevampRetrofit;
 import com.neotechInnovations.retailrevamp.Activity.HomepageActivity;
 import com.neotechInnovations.retailrevamp.Constant.Tags;
+import com.neotechInnovations.retailrevamp.Model.UserModel;
 import com.neotechInnovations.retailrevamp.R;
+import com.neotechInnovations.retailrevamp.Utils.SessionManagement;
+
+import org.json.JSONException;
+
+import java.io.IOException;
+import java.util.HashMap;
+
+import okhttp3.ResponseBody;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -31,6 +45,7 @@ public class LoginFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+    private static final String TAG = "LoginFragment";
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -39,8 +54,12 @@ public class LoginFragment extends Fragment {
     TextView txtLogin, txtSignUp;
     EditText etLoginUserName, etLoginUserPassword, etSignUpUserName, etSignUpUserEmail, etSignUpUserPassword, etSignUpUserConfirmPassword, etSignUpBusinessName;
     Button btnLogin, btnSignUp;
+    ProgressBar pbSignup, pbLogin;
     HomepageActivity activity;
-    ImageView ivBackBtn, ivShowPassword, ivHidePassword, ivSignupShowPassword, ivSignupHidePassword;
+    ImageView ivBackBtn,ivBackBtn2, ivShowPassword, ivHidePassword, ivSignupShowPassword, ivSignupHidePassword;
+    ScrollView svNotLoggedIn;
+    LinearLayout llLoggedIn;
+    TextView txtUserName, txtIntials;
 
     private boolean isPasswordVisible = true, isSignupPasswordVisible = true;
     Animation shakeAnimation;
@@ -91,6 +110,8 @@ public class LoginFragment extends Fragment {
         shakeAnimation = AnimationUtils.loadAnimation(getActivity(), R.anim.shake);
         btnLogin = view.findViewById(R.id.btn_login);
         btnSignUp = view.findViewById(R.id.btn_signup);
+        pbSignup = view.findViewById(R.id.pb_signup);
+        pbLogin = view.findViewById(R.id.pb_login);
         etLoginUserName = view.findViewById(R.id.et_login_user_name);
         etLoginUserPassword = view.findViewById(R.id.et_login_user_password);
         etSignUpUserName = view.findViewById(R.id.et_signup_name);
@@ -103,13 +124,19 @@ public class LoginFragment extends Fragment {
         llLoginContainer = view.findViewById(R.id.ll_login_container);
         llSignUpContainer = view.findViewById(R.id.ll_signup_container);
         ivBackBtn = view.findViewById(R.id.iv_back_btn);
+        ivBackBtn2 = view.findViewById(R.id.iv_back_btn_2);
         ivShowPassword = view.findViewById(R.id.iv_show_password);
         ivHidePassword = view.findViewById(R.id.iv_hide_password);
         ivSignupShowPassword = view.findViewById(R.id.iv_show_confirm_password_signup);
         ivSignupHidePassword = view.findViewById(R.id.iv_hide_confirm_password_signup);
+        svNotLoggedIn = view.findViewById(R.id.sv_not_logged_in);
+        llLoggedIn = view.findViewById(R.id.ll_logged_in);
+        txtUserName = view.findViewById(R.id.txt_user_name);
+        txtIntials = view.findViewById(R.id.txt_intials);
     }
 
     private void manipulateViews() {
+        loggedInSuccessfully();
         manipulateContainers(Tags.STRING_LOGIN_CONTAINER);
         togglePasswordVisibility(Tags.STRING_LOGIN_CONTAINER);
         togglePasswordVisibility(Tags.STRING_SIGNUP_CONTAINER);
@@ -160,6 +187,12 @@ public class LoginFragment extends Fragment {
                 ((HomepageActivity) activity).onBackPressed();
             }
         });
+        ivBackBtn2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ((HomepageActivity) activity).onBackPressed();
+            }
+        });
         txtLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -172,6 +205,7 @@ public class LoginFragment extends Fragment {
                 manipulateContainers(Tags.STRING_SIGNUP_CONTAINER);
             }
         });
+
     }
 
     private void loginUser() {
@@ -191,6 +225,54 @@ public class LoginFragment extends Fragment {
         //call the api and check if it exist
         //if exist then login -> check password ,userName
         //if doesnot exist then send to signUp page
+
+        //call the api and check if it exist
+        //if exist then throw to login & say it already exist
+        //if doesnot exist then create a user and login & say succesfully created account.
+
+        pbLogin.setVisibility(View.VISIBLE);
+        btnLogin.setVisibility(View.GONE);
+        RevampRetrofit revampRetrofit = new RevampRetrofit();
+
+        String url = Tags.URL_LOGIN; // Replace with your endpoint
+        HashMap<String, Object> data = new HashMap<>();  // Replace with your actual data object
+        data.put(Tags.KEY_NAME, userName);
+        data.put(Tags.KEY_PASSWORD, password);
+        Log.d(TAG, " userName :: " + userName);
+        revampRetrofit.getData(url, data, new ResponseListener() {
+            @Override
+            public void onSuccess(ResponseBody responseBody) throws IOException {
+                Log.d(TAG, "Response: " + responseBody);
+                UserModel userModel = UserModel.userResponseToUserModel(responseBody);
+                Log.d(TAG, "onSuccess: Loginuser userModel : " + userModel.getName());
+                SessionManagement sessionManagement = new SessionManagement(activity);
+                SessionManagement.saveSession(userModel.getId(), userModel.getName(), userModel.getName());
+                sessionManagement.getSession();
+                Log.d(TAG, "onSuccess: Successfully logged In : " + SessionManagement.userName);
+                Toast.makeText(activity, "Welcome " + SessionManagement.userName, Toast.LENGTH_SHORT).show();
+                loggedInSuccessfully();
+                clearForm();
+                pbLogin.setVisibility(View.GONE);
+                btnLogin.setVisibility(View.VISIBLE);
+                ((HomepageActivity) activity).loggedIn();
+            }
+
+            @Override
+            public void onFailure(ResponseBody responseBody) throws IOException {
+                Log.e(TAG, "Failed: " + responseBody);
+                Toast.makeText(activity, responseBody.string(), Toast.LENGTH_SHORT).show();
+                pbLogin.setVisibility(View.GONE);
+                btnLogin.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onRequestFailed(String message) {
+                Log.e(TAG, "Request Failure: " + message);
+                Toast.makeText(activity, message, Toast.LENGTH_SHORT).show();
+                pbLogin.setVisibility(View.GONE);
+                btnLogin.setVisibility(View.VISIBLE);
+            }
+        });
 
 
     }
@@ -228,14 +310,68 @@ public class LoginFragment extends Fragment {
             etSignUpUserConfirmPassword.setHintTextColor(getResources().getColor(R.color.decreasing_red));
             return;
         }
-        if(!password.equals(confirmPassword)){
+        if (!password.equals(confirmPassword)) {
             //password doesnot match
-            Toast.makeText(getContext(),"Password doesnot match",Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Password doesnot match", Toast.LENGTH_SHORT).show();
         }
         //call the api and check if it exist
         //if exist then throw to login & say it already exist
         //if doesnot exist then create a user and login & say succesfully created account.
+        pbSignup.setVisibility(View.VISIBLE);
+        btnSignUp.setVisibility(View.GONE);
+        RevampRetrofit revampRetrofit = new RevampRetrofit();
 
+        String url = Tags.URL_SIGNUP;// Replace with your endpoint
+        HashMap<String, Object> data = new HashMap<>();  // Replace with your actual data object
+        data.put("name", userName);
+        data.put("email", email);
+        data.put("businessName", businessName);
+        data.put("password", password);
+        data.put("phoneNumber", userName);
+        revampRetrofit.postData(url, data, new ResponseListener() {
+            @Override
+            public void onSuccess(ResponseBody responseBody) throws IOException, JSONException {
+                Log.d(TAG, "Response: " + responseBody.string());
+                UserModel userModel = UserModel.userResponseToUserModel(responseBody);
+                Log.d(TAG, "onSuccess: signupUser userModel : " + userModel.getName());
+                SessionManagement sessionManagement = new SessionManagement(activity);
+                SessionManagement.saveSession(userModel.getId(), userModel.getName(), userModel.getName());
+                sessionManagement.getSession();
+                Log.d(TAG, "onSuccess: Successfully logged In : " + SessionManagement.userName);
+                Toast.makeText(activity, "Welcome " + SessionManagement.userName, Toast.LENGTH_SHORT).show();
+                loggedInSuccessfully();
+                clearForm();
+                pbSignup.setVisibility(View.GONE);
+                btnSignUp.setVisibility(View.VISIBLE);
+                ((HomepageActivity) activity).loggedIn();
+            }
+
+            @Override
+            public void onFailure(ResponseBody responseBody) throws IOException {
+                Log.e(TAG, "Failed: " + responseBody.string());
+                Toast.makeText(activity, "Wrong credentials,Try again ", Toast.LENGTH_SHORT).show();
+                pbSignup.setVisibility(View.GONE);
+                btnSignUp.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onRequestFailed(String message) {
+                Log.e(TAG, "Request Failure: " + message);
+                Toast.makeText(activity, "Weak Internet ,Try again ", Toast.LENGTH_SHORT).show();
+                pbSignup.setVisibility(View.GONE);
+                btnSignUp.setVisibility(View.VISIBLE);
+            }
+        });
+    }
+
+    private void clearForm() {
+        etSignUpUserConfirmPassword.setText("");
+        etSignUpUserPassword.setText("");
+        etSignUpUserEmail.setText("");
+        etSignUpUserName.setText("");
+        etSignUpBusinessName.setText("");
+        etLoginUserPassword.setText("");
+        etLoginUserName.setText("");
     }
 
     private void manipulateContainers(String containerName) {
@@ -292,6 +428,25 @@ public class LoginFragment extends Fragment {
             // Move cursor to the end of the text
             etSignUpUserConfirmPassword.setSelection(etSignUpUserConfirmPassword.getText().length());
             isSignupPasswordVisible = !isSignupPasswordVisible;
+        }
+    }
+
+    public void loggedInSuccessfully() {
+        if (SessionManagement.userId != null) {
+            svNotLoggedIn.setVisibility(View.GONE);
+            llLoggedIn.setVisibility(View.VISIBLE);
+            String firstLetter = "";
+            firstLetter += SessionManagement.userName.charAt(0);
+            for (int i = 1; i < SessionManagement.userName.length(); i++) {
+                if (SessionManagement.userName.charAt(i - 1) == ' ') {
+                    firstLetter += SessionManagement.userName.charAt(i);
+                }
+            }
+            txtIntials.setText(firstLetter);
+            txtUserName.setText(SessionManagement.userName);
+        } else {
+            svNotLoggedIn.setVisibility(View.VISIBLE);
+            llLoggedIn.setVisibility(View.GONE);
         }
     }
 }

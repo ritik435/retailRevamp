@@ -1,9 +1,17 @@
 package com.neotechInnovations.retailrevamp.Model;
 
+import android.util.Log;
+
+import com.google.gson.Gson;
+
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.UUID;
 
+import okhttp3.ResponseBody;
+
 public class TransactionModel {
+    private static final String TAG ="TransactionModel" ;
     String userName;
     Timestamp date;
     Integer balance;
@@ -121,6 +129,16 @@ public class TransactionModel {
     public void setMode(String mode) {
         this.mode = mode;
     }
-
+    public static TransactionModel transactionResponseToTransactionModel(ResponseBody response){
+        TransactionModel transaction=null;
+        try {
+            // Parse the response body into the User model
+            transaction = new Gson().fromJson(response.string(), TransactionModel.class);
+//            RoomAndPollModel roomAndPollModel = new Gson().fromJson(String.valueOf(roomItems.get(i)), RoomAndPollModel.class);
+        }catch (IOException e) {
+            Log.e(TAG, "userResponseToUserModel: ", e);
+        }
+        return transaction;
+    }
 
 }

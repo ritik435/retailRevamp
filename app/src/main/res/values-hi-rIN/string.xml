@@ -19,7 +19,7 @@
         <string name="enter">Enter</string>
         <string name="close">Close</string>
         <string name="recents"><u>Recents</u></string>
-        <string name="hello_name">Hello, name</string>
+        <string name="hello_name">Hello, Guest</string>
         <string name="language_english">English</string>
         <string name="easy_mode">Easy mode</string>
         <string name="pro_mode">Pro</string>
@@ -65,6 +65,7 @@
         <string name="phone_number">Phone Number :</string>
         <string name="write_name_of_khata">Write the name of khata</string>
         <string name="khata_book">Khata Book</string>
+        <string name="go_to_profile"><u>Go to profile</u></string>
 
 
         <string name="sample_name">Ritik Arora</string>

@@ -545,6 +545,7 @@ public class AddTransactionFragment extends Fragment {
         } else
             initialiseTransactionRecyclerView();
         syncLists();
+//        ((HomepageActivity)activity).backupOnCloud(transactionModel);
         hideKeyboard(activity);
         resetAddTransadtion();
     }

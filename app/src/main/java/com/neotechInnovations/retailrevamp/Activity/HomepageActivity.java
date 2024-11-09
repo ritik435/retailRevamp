@@ -26,6 +26,11 @@ import androidx.recyclerview.widget.PagerSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SnapHelper;
 
+import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.navigation.NavigationView;
+import com.neotechInnovations.retailrevamp.API.ResponseListener;
+import com.neotechInnovations.retailrevamp.API.RevampRetrofit;
 import com.neotechInnovations.retailrevamp.Adapter.StatsticsInfoAdapter;
 import com.neotechInnovations.retailrevamp.Adapter.TransactionAdapter;
 import com.neotechInnovations.retailrevamp.Constant.Tags;
@@ -40,11 +45,10 @@ import com.neotechInnovations.retailrevamp.Model.TransactionModel;
 import com.neotechInnovations.retailrevamp.R;
 import com.neotechInnovations.retailrevamp.Utils.GoogleSheetsManager;
 import com.neotechInnovations.retailrevamp.Utils.LocaleHelper;
+import com.neotechInnovations.retailrevamp.Utils.SessionManagement;
 import com.neotechInnovations.retailrevamp.Utils.SharedPreference;
-import com.google.android.material.appbar.MaterialToolbar;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import com.google.android.material.navigation.NavigationView;
 
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -56,6 +60,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
+import okhttp3.ResponseBody;
 
 public class HomepageActivity extends AppCompatActivity {
 
@@ -90,10 +96,13 @@ public class HomepageActivity extends AppCompatActivity {
     public static List<TransactionModel> paymentTransactionModelList = new ArrayList<>();
     public static List<TransactionModel> khataTransactionModelList = new ArrayList<>();
     public static List<KhataModel> newKhataList = new ArrayList<>();
-    public static List<String> suggestedKhataList=new ArrayList<>();
+    public static List<String> suggestedKhataList = new ArrayList<>();
     StatsticsInfoAdapter statsticsInfoAdapter;
     TransactionAdapter transactionAdapter;
     Integer language;
+    CardView signUpButton;
+    LinearLayout llSidepanelDetails, llSidepanelSignUp;
+    TextView txtSidepanelPhoneNumber, txtSidepanelUserName, txtSidepanelUserEmail,txtUserName,txtSidepanelProfile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,6 +138,18 @@ public class HomepageActivity extends AppCompatActivity {
         flKhataFragment = findViewById(R.id.fl_khata);
         txtLanguage = findViewById(R.id.txt_language);
         materialSwitch = findViewById(R.id.material_switch);
+        txtUserName = findViewById(R.id.txt_user_name);
+        // Access the header layout
+        View headerView = nvSidebarMenu.getHeaderView(0);
+// Find the "Sign Up" button in the header and set a click listener
+        signUpButton = headerView.findViewById(R.id.cv_sign_up);
+        llSidepanelDetails = headerView.findViewById(R.id.ll_sidepanel_details);
+        llSidepanelSignUp = headerView.findViewById(R.id.ll_sidepanel_sign_up);
+        txtSidepanelPhoneNumber = headerView.findViewById(R.id.txt_sidepanel_phone_number);
+        txtSidepanelUserName = headerView.findViewById(R.id.txt_sidepanel_user_name);
+
+        txtSidepanelUserEmail = headerView.findViewById(R.id.txt_sidepanel_user_email);
+        txtSidepanelProfile = headerView.findViewById(R.id.txt_sidepanel_profile);
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -148,12 +169,36 @@ public class HomepageActivity extends AppCompatActivity {
         NavClick();
         changeLanguageManipulateViews(language);
         navigationLayoutAdjustment();
+        loggedIn();
 
         nvSidebarMenu.setVisibility(View.VISIBLE);
         drawerLayout.closeDrawer(GravityCompat.START);
         llSidebarBg.setVisibility(View.GONE);
 
-
+        txtSidepanelProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                nvSidebarMenu.setVisibility(View.GONE);
+                drawerLayout.closeDrawer(GravityCompat.START);
+                llSidebarBg.setVisibility(View.GONE);
+                // Handle the sign-up button click here
+                Toast.makeText(getApplicationContext(), "Sign Up clicked", Toast.LENGTH_SHORT).show();
+                manipulateLoginFragment(true);
+                // Or navigate to the sign-up screen
+            }
+        });
+        signUpButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                nvSidebarMenu.setVisibility(View.GONE);
+                drawerLayout.closeDrawer(GravityCompat.START);
+                llSidebarBg.setVisibility(View.GONE);
+                // Handle the sign-up button click here
+                Toast.makeText(getApplicationContext(), "Sign Up clicked", Toast.LENGTH_SHORT).show();
+                manipulateLoginFragment(true);
+                // Or navigate to the sign-up screen
+            }
+        });
         drawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
             @Override
             public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {
@@ -186,12 +231,13 @@ public class HomepageActivity extends AppCompatActivity {
         }
 
         cvAppLock.setOnTouchListener(new View.OnTouchListener() {
-            private boolean inArea=false;
+            private boolean inArea = false;
+
             @SuppressLint("NotifyDataSetChanged")
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                    inArea=true;
+                    inArea = true;
                     cvAppLock.setAlpha(0.3f);
                 } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
                     if (inArea) {
@@ -204,7 +250,7 @@ public class HomepageActivity extends AppCompatActivity {
                         //save data in sheets
                         saveDataInSheets();
                     }
-                }else if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
+                } else if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
                     Log.d(TAG, "onTouch: manipulateAddTransactionFragment MOVEDD ");
                     if (!isInsideButtonArea(view, motionEvent)) {
                         // Set alpha back to 1 when the finger moves outside the button area
@@ -220,10 +266,11 @@ public class HomepageActivity extends AppCompatActivity {
         });
         llLanguageChange.setOnTouchListener(new View.OnTouchListener() {
             private boolean inArea = false;
+
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                    inArea=true;
+                    inArea = true;
                     llLanguageChange.setAlpha(0.3f);
                 } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
                     if (inArea) {
@@ -275,7 +322,7 @@ public class HomepageActivity extends AppCompatActivity {
             public void onStateChanged(@NonNull View view, int newState) {
                 switch (newState) {
                     case BottomSheetBehavior.STATE_HIDDEN: {
-                        manipulateAddTransactionFragment("", false,"");
+                        manipulateAddTransactionFragment("", false, "");
                     }
                     break;
                     case BottomSheetBehavior.STATE_EXPANDED: {
@@ -298,10 +345,11 @@ public class HomepageActivity extends AppCompatActivity {
         });
         txtAllTransaction.setOnTouchListener(new View.OnTouchListener() {
             private boolean inArea = false;
+
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                    inArea=true;
+                    inArea = true;
                     txtAllTransaction.setAlpha(0.5f);
                 } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
                     if (inArea) {
@@ -309,7 +357,7 @@ public class HomepageActivity extends AppCompatActivity {
                         Log.d(TAG, "onTouch: manipulateAllTransactionFragment : to call ");
                         manipulateAllTransactionFragment(true);
                     }
-                }else if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
+                } else if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
                     Log.d(TAG, "onTouch: manipulateAddTransactionFragment MOVEDD ");
                     if (!isInsideButtonArea(view, motionEvent)) {
                         // Set alpha back to 1 when the finger moves outside the button area
@@ -335,7 +383,7 @@ public class HomepageActivity extends AppCompatActivity {
                     if (inArea) {
                         cvAddCollection.setAlpha(1f);
                         Log.d(TAG, "onTouch: manipulateAddTransactionFragment : cvAddCollection to call ");
-                        manipulateAddTransactionFragment(Tags.KEY_ADD_COLLECTION, true,"");
+                        manipulateAddTransactionFragment(Tags.KEY_ADD_COLLECTION, true, "");
                     }
                 } else if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
                     Log.d(TAG, "onTouch: manipulateAddTransactionFragment MOVEDD ");
@@ -359,13 +407,13 @@ public class HomepageActivity extends AppCompatActivity {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                    inArea=true;
+                    inArea = true;
                     cvAddPayments.setAlpha(0.5f);
                 } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
                     if (inArea) {
                         cvAddPayments.setAlpha(1f);
                         Log.d(TAG, "onTouch: manipulateAddTransactionFragment : to call ");
-                        manipulateAddTransactionFragment(Tags.KEY_ADD_PAYMENTS, true,"");
+                        manipulateAddTransactionFragment(Tags.KEY_ADD_PAYMENTS, true, "");
                     }
                 } else if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
                     Log.d(TAG, "onTouch: manipulateAddTransactionFragment MOVEDD ");
@@ -384,17 +432,18 @@ public class HomepageActivity extends AppCompatActivity {
 
         cvAddSales.setOnTouchListener(new View.OnTouchListener() {
             private boolean inArea = false;
+
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                    inArea=true;
+                    inArea = true;
                     cvAddSales.setAlpha(0.5f);
                 } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
                     if (inArea) {
                         cvAddSales.setAlpha(1f);
-                        manipulateAddTransactionFragment(Tags.KEY_ADD_SALES, true,"");
+                        manipulateAddTransactionFragment(Tags.KEY_ADD_SALES, true, "");
                     }
-                }else if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
+                } else if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
                     Log.d(TAG, "onTouch: manipulateAddTransactionFragment MOVEDD ");
                     if (!isInsideButtonArea(view, motionEvent)) {
                         // Set alpha back to 1 when the finger moves outside the button area
@@ -411,15 +460,16 @@ public class HomepageActivity extends AppCompatActivity {
 
         cvAddEntryInKhata.setOnTouchListener(new View.OnTouchListener() {
             private boolean inArea = false;
+
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                    inArea=true;
+                    inArea = true;
                     cvAddEntryInKhata.setAlpha(0.5f);
                 } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
                     if (inArea) {
                         cvAddEntryInKhata.setAlpha(1f);
-                        manipulateAddTransactionFragment(Tags.KEY_ADD_ENTRY_IN_KHATA, true,"");
+                        manipulateAddTransactionFragment(Tags.KEY_ADD_ENTRY_IN_KHATA, true, "");
                     }
                 } else if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
                     Log.d(TAG, "onTouch: manipulateAddTransactionFragment MOVEDD ");
@@ -438,22 +488,22 @@ public class HomepageActivity extends AppCompatActivity {
     }
 
     private void refineKhataIds() {
-        Log.d(TAG, "refineKhataIds: REFINEKHATA : newKhataList : "+newKhataList.size());
-        for (int i=0;i<newKhataList.size();i++){
-            KhataModel khataModel=newKhataList.get(i);
-            if (khataModel.getKhataUserIdString()==null){
-                String khatauserIdString="";
-                khatauserIdString+="(#";
-                khatauserIdString+=khataModel.getKhataSerialNumber();
-                khatauserIdString+=") ";
-                khatauserIdString+=khataModel.getKhataUserName();
+        Log.d(TAG, "refineKhataIds: REFINEKHATA : newKhataList : " + newKhataList.size());
+        for (int i = 0; i < newKhataList.size(); i++) {
+            KhataModel khataModel = newKhataList.get(i);
+            if (khataModel.getKhataUserIdString() == null) {
+                String khatauserIdString = "";
+                khatauserIdString += "(#";
+                khatauserIdString += khataModel.getKhataSerialNumber();
+                khatauserIdString += ") ";
+                khatauserIdString += khataModel.getKhataUserName();
                 newKhataList.get(i).setKhataUserIdString(khatauserIdString);
                 suggestedKhataList.add(khatauserIdString);
-            }else {
+            } else {
                 suggestedKhataList.add(khataModel.getKhataUserIdString());
             }
         }
-        Log.d(TAG, "refineKhataIds: REFINEKHATA : suggestedKhataList : "+suggestedKhataList.size());
+        Log.d(TAG, "refineKhataIds: REFINEKHATA : suggestedKhataList : " + suggestedKhataList.size());
     }
 
     private void navigationLayoutAdjustment() {
@@ -500,13 +550,15 @@ public class HomepageActivity extends AppCompatActivity {
                 manipulateLoginFragment(true);
             } else if (item.getItemId() == R.id.logout) {
                 Log.d(TAG, "NavClick: 3");
+                logout();
                 manipulateLoginFragment(true);
+                loggedIn();
             } else if (item.getItemId() == R.id.create_khata) {
                 Log.d(TAG, "NavClick: 4");
-                manipulateCreateKhataFragment(true,Tags.KEY_CREATE_KHATA);
+                manipulateCreateKhataFragment(true, Tags.KEY_CREATE_KHATA);
             } else if (item.getItemId() == R.id.view_all_khata) {
                 Log.d(TAG, "NavClick: 4a");
-                manipulateCreateKhataFragment(true,Tags.KEY_VIEW_KHATA);
+                manipulateCreateKhataFragment(true, Tags.KEY_VIEW_KHATA);
             } else if (item.getItemId() == R.id.erase_all_data) {
                 Log.d(TAG, "NavClick: 5");
                 SharedPreference.clearLists();
@@ -533,6 +585,29 @@ public class HomepageActivity extends AppCompatActivity {
         });
     }
 
+    private void logout() {
+        if (SessionManagement.userId != null) {
+            SessionManagement sessionManagement = new SessionManagement(this);
+            sessionManagement.clearSession();
+        }
+    }
+    public void loggedIn() {
+        SessionManagement sessionManagement=new SessionManagement(this);
+        sessionManagement.getSession();
+        if (SessionManagement.userId != null) {
+            llSidepanelDetails.setVisibility(View.VISIBLE);
+            llSidepanelSignUp.setVisibility(View.GONE);
+            txtSidepanelPhoneNumber.setText(SessionManagement.userId);
+            txtSidepanelUserName.setText(SessionManagement.userName);
+            txtSidepanelUserEmail.setText(SessionManagement.userImage);
+            txtUserName.setText("Hello , "+SessionManagement.userName);
+        } else {
+            llSidepanelDetails.setVisibility(View.GONE);
+            llSidepanelSignUp.setVisibility(View.VISIBLE);
+            txtUserName.setText("Hello , Guest");
+        }
+    }
+
     public void onClick(View view) {
         if (view.getId() == R.id.ll_close_add_transaction) {
             addTransactionBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
@@ -545,19 +620,19 @@ public class HomepageActivity extends AppCompatActivity {
         super.onBackPressed();
         Log.d(TAG, "onBackPressed: is pressed" + isAddTransactionFragmentOpened + " : " + isAllTransactionFragmentOpened + " : " + isCreateKhataFragmentOpened + " : " + isLoginFragmentOpened);
         if (isAddTransactionFragmentOpened) {
-            manipulateAddTransactionFragment("", false,"");
+            manipulateAddTransactionFragment("", false, "");
         } else if (isAllTransactionFragmentOpened) {
             manipulateAllTransactionFragment(false);
         } else if (isKhataFragmentOpened) {
-            manipulateKhataFragment(false,null);
+            manipulateKhataFragment(false, null);
         } else if (isCreateKhataFragmentOpened) {
-            manipulateCreateKhataFragment(false,Tags.KEY_VIEW_KHATA);
+            manipulateCreateKhataFragment(false, Tags.KEY_VIEW_KHATA);
         } else if (isLoginFragmentOpened) {
             manipulateLoginFragment(false);
         }
     }
 
-    public void manipulateAddTransactionFragment(String keyAddTransaction, boolean toOpen , String entryKhataName) {
+    public void manipulateAddTransactionFragment(String keyAddTransaction, boolean toOpen, String entryKhataName) {
         Log.d(TAG, "manipulateAddTransactionFragment: entered... : " + toOpen + " : " + keyAddTransaction);
         if (toOpen) {
             flAddTransaction.setVisibility(View.VISIBLE);
@@ -572,7 +647,7 @@ public class HomepageActivity extends AppCompatActivity {
             flAddTransaction.setVisibility(View.GONE);
             flAddTransactionBg.setVisibility(View.GONE);
             isAddTransactionFragmentOpened = false;
-            if (isKhataFragmentOpened){
+            if (isKhataFragmentOpened) {
                 khataFragment.addElementsInRecents();
             }
         }
@@ -604,7 +679,7 @@ public class HomepageActivity extends AppCompatActivity {
         }
     }
 
-    public void manipulateCreateKhataFragment(boolean toOpen , String khataOpening) {
+    public void manipulateCreateKhataFragment(boolean toOpen, String khataOpening) {
         if (toOpen) {
             createKhataFragment = CreateKhataFragment.newInstance(khataOpening, "");
             flCreateKhataFragment.setVisibility(View.VISIBLE);
@@ -619,7 +694,7 @@ public class HomepageActivity extends AppCompatActivity {
         }
     }
 
-    public void manipulateKhataFragment(boolean toOpen,KhataModel khataModel) {
+    public void manipulateKhataFragment(boolean toOpen, KhataModel khataModel) {
         if (toOpen) {
             flKhataFragment.setVisibility(View.VISIBLE);
             khataFragment = KhataFragment.newInstance(khataModel, "");
@@ -772,7 +847,7 @@ public class HomepageActivity extends AppCompatActivity {
         if (newKhataList == null) {
             newKhataList = new ArrayList<>();
         }
-        Log.d(TAG, "retrieveDataFromLocal: REFINEKHATA : newKhataList : "+newKhataList.size());
+        Log.d(TAG, "retrieveDataFromLocal: REFINEKHATA : newKhataList : " + newKhataList.size());
 
         initialiseTransactionRecyclerView();
     }
@@ -854,7 +929,7 @@ public class HomepageActivity extends AppCompatActivity {
             @Override
             public void onSheetCreated(String sheetLink) {
                 Log.d(TAG, "onSheetCreated: sheet is GoogleSheetsManager : created : ---- " + sheetLink);
-                Toast.makeText(getApplicationContext(),sheetLink,Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), sheetLink, Toast.LENGTH_LONG).show();
                 spreadsheetLink = sheetLink;
             }
 
@@ -1043,4 +1118,33 @@ public class HomepageActivity extends AppCompatActivity {
 //        // and passing our json object
 //        queue.add(jsonObjectRequest);
 //    }
+    public void backupOnCloud(TransactionModel transactionModel){
+        RevampRetrofit revampRetrofit = new RevampRetrofit();
+
+        String url = Tags.URL_LOGIN; // Replace with your endpoint
+        HashMap<String, Object> data = new HashMap<>();  // Replace with your actual data object
+//        data.put(Tags.KEY_NAME, transactionModel.getUserName());
+//        data.put(Tags.KEY_PASSWORD, password);
+        Log.d(TAG, " userName :: " + transactionModel.getUserName());
+        revampRetrofit.postDataTransaction(url, transactionModel, new ResponseListener() {
+            @Override
+            public void onSuccess(ResponseBody responseBody) throws IOException {
+                Log.d(TAG, "onSuccess : Response: Transaction is done" + responseBody);
+                TransactionModel transactionModel1 = TransactionModel.transactionResponseToTransactionModel(responseBody);
+                Log.d(TAG, "onSuccess: transaction is : "+transactionModel1.getUserName());
+            }
+
+            @Override
+            public void onFailure(ResponseBody responseBody) throws IOException {
+                Log.e(TAG, "onFailure Failed: " + responseBody);
+                Toast.makeText(getApplicationContext(), responseBody.string(), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onRequestFailed(String message) {
+                Log.e(TAG, "onRequestFailed : Request Failure: " + message);
+                Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
 }

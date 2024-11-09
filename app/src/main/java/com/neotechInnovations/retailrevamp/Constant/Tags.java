@@ -1,6 +1,10 @@
 package com.neotechInnovations.retailrevamp.Constant;
 
 public class Tags {
+    public static String SHARED_PREF_NAME="sessionManagement";
+    public static String SESSION_USER_NAME="sessionUserName";
+    public static String SESSION_USER_ID="sessionUserId";
+    public static String SESSION_USER_IMAGE="sessionUserImage";
     public static String STRING_LOGIN_CONTAINER="loginContainer";
     public static String STRING_SIGNUP_CONTAINER="signUpContainer";
     public static String STRING_ADD_PAYMENTS="Add Payments";
@@ -24,7 +28,17 @@ public class Tags {
     public static String KEY_ONLINE="online";
     public static String KEY_OFFLINE="offline";
     public static String KEY_CHEQUE="cheque";
+    public static String KEY_NAME="name";
+    public static String KEY_USERNAME="userName";
+    public static String KEY_PASSWORD="password";
+
+
     public static String DATE_FORMAT="dd MMMM yy";
     public static String TIME_FORMAT="hh:mma";
     public static String PREFIX_SPREADSHEET_LINK="https://docs.google.com/spreadsheets/d/";
+    public static String URL_LOGIN="https://retail-revamp-backend.vercel.app/api/user/user";
+    public static String URL_SIGNUP="https://retail-revamp-backend.vercel.app/api/user/add-user";
+
+
+
 }
