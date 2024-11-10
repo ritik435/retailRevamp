@@ -1,8 +1,15 @@
 package com.neotechInnovations.retailrevamp.Model;
 
-import org.json.JSONArray;
+import com.google.gson.Gson;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class KhataModel implements Serializable {
@@ -77,5 +84,22 @@ public class KhataModel implements Serializable {
 
     public void setKhataTransactions(JSONArray khataTransactions) {
         this.khataTransactions = khataTransactions;
+    }
+
+
+    public static KhataModel khataJSONToKhataModel(JSONObject khataItem) throws IOException, JSONException {
+        return new Gson().fromJson(String.valueOf(khataItem), KhataModel.class);
+    }
+    public static List<KhataModel> khataResponseToKhataModelList(JSONArray khataArray) throws IOException, JSONException {
+        List<KhataModel> khataModelList = new ArrayList<>();
+        Gson gson = new Gson();
+
+        for (int i = 0; i < khataArray.length(); i++) {
+            JSONObject transactionObject = khataArray.getJSONObject(i);
+            KhataModel khataModel = gson.fromJson(transactionObject.toString(), KhataModel.class);
+            khataModelList.add(khataModel);
+        }
+
+        return khataModelList;
     }
 }

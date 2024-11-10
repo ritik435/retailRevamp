@@ -78,6 +78,16 @@
                     android:layout_gravity="center"
                     android:src="@color/black_10" />
 
+                    <ImageView
+                        android:id="@+id/iv_is_backed_up"
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
+                        android:layout_gravity="center"
+                        android:layout_marginEnd="2dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_alignParentBottom="true"
+                        android:src="@drawable/iv_back_up_on_account" />
+
                 </RelativeLayout>
             </androidx.cardview.widget.CardView>
 

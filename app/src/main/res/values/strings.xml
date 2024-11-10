@@ -54,6 +54,7 @@
     <string name="back_up_on_account">Back up on account</string>
     <string name="upload_on_excel">Upload on Excel</string>
     <string name="transfer_all_data">Transfer All data</string>
+    <string name="restore_all_data">Restore All data</string>
     <string name="erase_all_data">Erase All data</string>
     <string name="logout">Logout</string>
     <string name="settings">Settings</string>

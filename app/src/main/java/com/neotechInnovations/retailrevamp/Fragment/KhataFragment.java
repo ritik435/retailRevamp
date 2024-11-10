@@ -171,7 +171,7 @@ public class KhataFragment extends Fragment {
 //        transactionModelList=HomepageActivity.khataTransactionModelList;
     }
     public void initialiseTransactionRecyclerView(){
-        khataTransactions= new TransactionAdapter(transactionModelList,activity);
+        khataTransactions= new TransactionAdapter(transactionModelList,activity,Tags.KEY_SPECIFIC);
         rvKhataTransactions.setLayoutManager(new LinearLayoutManager(activity,LinearLayoutManager.VERTICAL,false));
         rvKhataTransactions.setAdapter(khataTransactions);
     }

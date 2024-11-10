@@ -5,6 +5,9 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.io.Serializable;
 
@@ -73,10 +76,14 @@ public class UserModel implements Serializable {
         try {
             // Parse the response body into the User model
             user = new Gson().fromJson(response.string(), UserModel.class);
+            Log.d(TAG, "userResponseToUserModel: completed : "+user);
 //            RoomAndPollModel roomAndPollModel = new Gson().fromJson(String.valueOf(roomItems.get(i)), RoomAndPollModel.class);
         }catch (IOException e) {
             Log.e(TAG, "userResponseToUserModel: ", e);
         }
         return user;
+    }
+    public static UserModel userJSONToUserModel(JSONObject userItem) throws IOException, JSONException {
+        return new Gson().fromJson(String.valueOf(userItem), UserModel.class);
     }
 }

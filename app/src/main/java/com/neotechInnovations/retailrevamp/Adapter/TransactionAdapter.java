@@ -28,9 +28,11 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
     private static final String TAG = "TransactionAdapter";
     public List<TransactionModel> transactionModelList;
     Context mContext;
-    public TransactionAdapter(List<TransactionModel> transactionModelList, Context mContext) {
+    String openedFrom;
+    public TransactionAdapter(List<TransactionModel> transactionModelList, Context mContext,String openedFrom) {
         this.transactionModelList = transactionModelList;
         this.mContext = mContext;
+        this.openedFrom=openedFrom;
     }
 
     @NonNull
@@ -65,17 +67,21 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         if (!transactionModel.getTransaction()){
             holder.llMainTransaction.setVisibility(View.GONE);
             holder.llDateOfTransaction.setVisibility(View.VISIBLE);
-
+            Log.d(TAG, "onBindViewHolder: isBackedUp: "+ transactionModel.isBackedUp());
         }else {
             holder.llMainTransaction.setVisibility(View.VISIBLE);
             holder.llDateOfTransaction.setVisibility(View.GONE);
-            Log.d(TAG, "onBindViewHolder: getTransaction :: "+transactionModel.getTransaction()+" : "+transactionModel.getPaymentType() + " key: "+transactionModel.getKey());
-            if (transactionModel.getKey().equals(Tags.KEY_ADD_PAYMENTS)){
+            Log.d(TAG, "onBindViewHolder: isBackedUp: "+ transactionModel.isBackedUp()+" getTransaction :: " +transactionModel.getTransaction()+" : "+transactionModel.getPaymentType() + " key: "+transactionModel.getKey() +" : userId : "+transactionModel.getUserId());
 
+            if (transactionModel.isBackedUp() && openedFrom.equals(Tags.KEY_HOME))
+                holder.ivIsBackedUp.setVisibility(View.VISIBLE);
+            else
+                holder.ivIsBackedUp.setVisibility(View.GONE);
+
+            if (transactionModel.getKey().equals(Tags.KEY_ADD_PAYMENTS)){
                 holder.ivPaymentType.setImageResource(R.drawable.iv_red_up_arrow);
                 holder.ivPaymentType2.setImageResource(R.drawable.iv_red_up_arrow);
             }else if (transactionModel.getKey().equals(Tags.KEY_ADD_COLLECTION)){
-
                 holder.ivPaymentType.setImageResource(R.drawable.iv_green_down_arrow);
                 holder.ivPaymentType2.setImageResource(R.drawable.iv_green_down_arrow);
             }else if (transactionModel.getKey().equals(Tags.KEY_ADD_ENTRY_IN_KHATA)){
@@ -141,7 +147,7 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
     public class TransactionViewHolder extends RecyclerView.ViewHolder {
         LinearLayout llDateOfTransaction,llMainTransaction,llBalance;
         TextView txtDate,txtTime,txtUserName,txtPaymentBalance,txtAmountTransferred,txtHeaderDate,txtPrefixBalance,txtSufixBalance;
-        ImageView ivPaymentMode, ivPaymentType,ivPaymentType2;
+        ImageView ivPaymentMode, ivPaymentType,ivPaymentType2,ivIsBackedUp;
         public TransactionViewHolder(@NonNull View itemView) {
             super(itemView);
             llDateOfTransaction=itemView.findViewById(R.id.ll_date_of_transaction);
@@ -158,6 +164,7 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
             ivPaymentMode=itemView.findViewById(R.id.iv_payment_mode);
             txtHeaderDate=itemView.findViewById(R.id.txt_header_date);
             llBalance=itemView.findViewById(R.id.ll_balance);
+            ivIsBackedUp=itemView.findViewById(R.id.iv_is_backed_up);
         }
     }
 }

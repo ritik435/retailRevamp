@@ -34,6 +34,11 @@
             android:icon="@drawable/iv_transfer_all_data">
         </item>
         <item
+            android:title="@string/restore_all_data"
+            android:id="@+id/restore_all_data"
+            android:icon="@drawable/iv_transfer_all_data">
+        </item>
+        <item
             android:title="@string/erase_all_data"
             android:id="@+id/erase_all_data"
             android:icon="@drawable/iv_erase_all_data">

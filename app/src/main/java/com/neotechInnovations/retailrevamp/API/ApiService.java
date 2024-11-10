@@ -1,5 +1,6 @@
 package com.neotechInnovations.retailrevamp.API;
 
+import com.neotechInnovations.retailrevamp.Model.KhataModel;
 import com.neotechInnovations.retailrevamp.Model.TransactionModel;
 
 import java.util.HashMap;
@@ -8,6 +9,7 @@ import java.util.Map;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.QueryMap;
@@ -25,5 +27,9 @@ public interface ApiService {
     Call<ResponseBody> postData(@Url String url, @Body HashMap<String, Object> hashMap);
     @POST()
     Call<ResponseBody> postData(@Url String url, @Body TransactionModel transactionModel);
+    @POST()
+    Call<ResponseBody> postData(@Url String url, @Body KhataModel khataModel);
+    @DELETE()
+    Call<ResponseBody> deleteTransactions(@Url String url, @QueryMap  HashMap<String, Object> hashMap);
 
 }

@@ -36,6 +36,7 @@ import com.neotechInnovations.retailrevamp.Constant.Tags;
 import com.neotechInnovations.retailrevamp.Model.KhataModel;
 import com.neotechInnovations.retailrevamp.Model.TransactionModel;
 import com.neotechInnovations.retailrevamp.R;
+import com.neotechInnovations.retailrevamp.Utils.SessionManagement;
 import com.neotechInnovations.retailrevamp.Utils.SharedPreference;
 
 import java.sql.Timestamp;
@@ -509,6 +510,8 @@ public class AddTransactionFragment extends Fragment {
         transactionModel.setTransaction(true);
         transactionModel.setKey(keyAddTransaction);
         transactionModel.setPaymentType(paymentType);
+        transactionModel.setBackedUp(false);
+        transactionModel.setUserId(SessionManagement.userId);
         if (keyAddTransaction.equals(Tags.KEY_ADD_ENTRY_IN_KHATA)) {
             Log.d(TAG, "addTransaction: AddEntryInKhata: " + userName);
             transactionModel.setKhataNumber(userName);
@@ -623,6 +626,8 @@ public class AddTransactionFragment extends Fragment {
         TransactionModel transactionModel = new TransactionModel();
         transactionModel.setDate(specificTransaction.getDate());
         transactionModel.setTransaction(false);
+        transactionModel.setBackedUp(false);
+        transactionModel.setUserId(SessionManagement.userId);
         Log.d(TAG, "checkAnotherTransaction 3 a) : currentDateString" + currentdateString + " latestEntrySpecificDateString : " + latestEntrySpecificDateString);
 
         if ((specificTransactionModelList != null && specificTransactionModelList.size() > 0) && currentdateString.equals(latestEntrySpecificDateString)) {
@@ -679,7 +684,7 @@ public class AddTransactionFragment extends Fragment {
 
     public void initialiseTransactionRecyclerView() {
 //        Log.d(TAG, "initialiseTransactionRecyclerView: "+specificTransactionModelList.size());
-        transactionAdapter = new TransactionAdapter(specificTransactionModelList, activity);
+        transactionAdapter = new TransactionAdapter(specificTransactionModelList, activity,Tags.KEY_SPECIFIC);
         rvRecents.setLayoutManager(new LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false));
         rvRecents.setAdapter(transactionAdapter);
     }

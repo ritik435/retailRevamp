@@ -4,14 +4,21 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import okhttp3.ResponseBody;
 
 public class TransactionModel {
     private static final String TAG ="TransactionModel" ;
+    String userId;
     String userName;
     Timestamp date;
     Integer balance;
@@ -25,6 +32,23 @@ public class TransactionModel {
     String khataNumber;
     boolean deleted;
     boolean edited;
+    boolean backedUp;
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public boolean isBackedUp() {
+        return backedUp;
+    }
+
+    public void setBackedUp(boolean backedUp) {
+        this.backedUp = backedUp;
+    }
 
     public boolean isEdited() {
         return edited;
@@ -134,6 +158,7 @@ public class TransactionModel {
         try {
             // Parse the response body into the User model
             transaction = new Gson().fromJson(response.string(), TransactionModel.class);
+            Log.d(TAG, "transactionResponseToTransactionModel: "+transaction);
 //            RoomAndPollModel roomAndPollModel = new Gson().fromJson(String.valueOf(roomItems.get(i)), RoomAndPollModel.class);
         }catch (IOException e) {
             Log.e(TAG, "userResponseToUserModel: ", e);
@@ -141,4 +166,19 @@ public class TransactionModel {
         return transaction;
     }
 
+    public static TransactionModel transactionJSONToTransactionModel(JSONObject transactionItem) throws IOException, JSONException {
+        return new Gson().fromJson(String.valueOf(transactionItem), TransactionModel.class);
+    }
+    public static List<TransactionModel> transactionResponseToTransactionModelList(JSONArray transactionArray) throws IOException, JSONException {
+        List<TransactionModel> transactionList = new ArrayList<>();
+        Gson gson = new Gson();
+
+        for (int i = 0; i < transactionArray.length(); i++) {
+            JSONObject transactionObject = transactionArray.getJSONObject(i);
+            TransactionModel transaction = gson.fromJson(transactionObject.toString(), TransactionModel.class);
+            transactionList.add(transaction);
+        }
+
+        return transactionList;
+    }
 }

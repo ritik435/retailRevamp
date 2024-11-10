@@ -3,6 +3,7 @@ package com.neotechInnovations.retailrevamp.API;
 
 import android.util.Log;
 
+import com.neotechInnovations.retailrevamp.Model.KhataModel;
 import com.neotechInnovations.retailrevamp.Model.TransactionModel;
 
 import org.json.JSONException;
@@ -39,7 +40,46 @@ public class RevampRetrofit {
 //                    else {
 //                        responseListner.onRequestFailed(Tags.TRY_AGAIN);
 //                    }
+                    } catch (IOException | JSONException e) {
+                        Log.e(TAG, "onResponse: postData response :: "+response.toString(), e);
+                    }
+                } else {
+                    Log.d(TAG, "onResponse: response first " + response);
+                    try {
+                        responseListner.onSuccess(response.body());
+                        Log.d(TAG, "onResponse: reponse got" + response.body().string());
                     } catch (IOException e) {
+                        Log.d(TAG, "onResponse: " + e.getMessage());
+                        e.printStackTrace();
+                    } catch (JSONException e) {
+                        Log.d(TAG, "onResponse: 2" + e.getMessage());
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Log.d(TAG, "onFailure: " + t.getMessage());
+                responseListner.onRequestFailed(t.getMessage());
+            }
+        });
+    }
+    public void deleteTransactions(String url, HashMap<String, Object> data, ResponseListener responseListner) {
+        Call<ResponseBody> call = apiService.deleteTransactions(url, data);
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                Log.d(TAG, "onResponse: called");
+                if (!response.isSuccessful()) {
+                    try {
+//                    if(response.code() == Tags.STATUS_CODE_503){
+                        responseListner.onFailure(response.body());
+//                    }
+//                    else {
+//                        responseListner.onRequestFailed(Tags.TRY_AGAIN);
+//                    }
+                    } catch (IOException | JSONException e) {
                         Log.e(TAG, "onResponse: postData response :: "+response.toString(), e);
                     }
                 } else {
@@ -70,7 +110,7 @@ public class RevampRetrofit {
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                Log.d(TAG, "onResponse: called");
+                Log.d(TAG, "onResponse: called 000 ,,,");
                 if (!response.isSuccessful()) {
                     try {
 //                    if(response.code() == Tags.STATUS_CODE_503){
@@ -79,16 +119,55 @@ public class RevampRetrofit {
 //                    else {
 //                        responseListner.onRequestFailed(Tags.TRY_AGAIN);
 //                    }
-                    } catch (IOException e) {
+                    } catch (IOException | JSONException e) {
                         Log.e(TAG, "onResponse: postData response :: "+response.toString(), e);
                     }
                 } else {
-                    Log.d(TAG, "onResponse: response first " + response);
+                    Log.d(TAG, "onResponse: 111: " + response);
                     try {
                         responseListner.onSuccess(response.body());
-                        Log.d(TAG, "onResponse: reponse got" + response.body().string());
+                        Log.d(TAG, "onResponse: reponse got 222: " + response.body().string());
                     } catch (IOException e) {
-                        Log.d(TAG, "onResponse: " + e.getMessage());
+                        Log.d(TAG, "onResponse: 333: " + e.getMessage());
+                        e.printStackTrace();
+                    } catch (JSONException e) {
+                        Log.d(TAG, "onResponse: 2" + e.getMessage());
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Log.d(TAG, "onFailure: " + t.getMessage());
+                responseListner.onRequestFailed(t.getMessage());
+            }
+        });
+    }
+    public void postDataKhata(String url, KhataModel khataModel, ResponseListener responseListner) {
+        Call<ResponseBody> call = apiService.postData(url, khataModel);
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                Log.d(TAG, "onResponse: called 000 ,,,");
+                if (!response.isSuccessful()) {
+                    try {
+//                    if(response.code() == Tags.STATUS_CODE_503){
+                        responseListner.onFailure(response.body());
+//                    }
+//                    else {
+//                        responseListner.onRequestFailed(Tags.TRY_AGAIN);
+//                    }
+                    } catch (IOException | JSONException e) {
+                        Log.e(TAG, "onResponse: postData response :: "+response.toString(), e);
+                    }
+                } else {
+                    Log.d(TAG, "onResponse: 111: " + response);
+                    try {
+                        responseListner.onSuccess(response.body());
+                        Log.d(TAG, "onResponse: reponse got 222: " + response.body().string());
+                    } catch (IOException e) {
+                        Log.d(TAG, "onResponse: 333: " + e.getMessage());
                         e.printStackTrace();
                     } catch (JSONException e) {
                         Log.d(TAG, "onResponse: 2" + e.getMessage());
@@ -211,7 +290,7 @@ public class RevampRetrofit {
                         // Pass the error message to the listener or handle accordingly
                         responseListner.onRequestFailed(errorMessage);
                     }
-                    } catch (IOException e) {
+                    } catch (IOException | JSONException e) {
                         Log.e(TAG, "onResponse: getData response :: "+response.toString(), e);
                     }
 //                    } else if (response.code() == Tags.STATUS_CODE_400) {

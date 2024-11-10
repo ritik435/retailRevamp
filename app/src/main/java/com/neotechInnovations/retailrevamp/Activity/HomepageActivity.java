@@ -1,7 +1,9 @@
 package com.neotechInnovations.retailrevamp.Activity;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
@@ -9,6 +11,7 @@ import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -47,6 +50,10 @@ import com.neotechInnovations.retailrevamp.Utils.GoogleSheetsManager;
 import com.neotechInnovations.retailrevamp.Utils.LocaleHelper;
 import com.neotechInnovations.retailrevamp.Utils.SessionManagement;
 import com.neotechInnovations.retailrevamp.Utils.SharedPreference;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -97,12 +104,15 @@ public class HomepageActivity extends AppCompatActivity {
     public static List<TransactionModel> khataTransactionModelList = new ArrayList<>();
     public static List<KhataModel> newKhataList = new ArrayList<>();
     public static List<String> suggestedKhataList = new ArrayList<>();
+    boolean needForceBackedUp = true;
+    int backupCountTrans = 0, backedUpSuccessTrans = 0;
+    int backupCountKhata = 0, backedUpSuccessKhata = 0;
     StatsticsInfoAdapter statsticsInfoAdapter;
     TransactionAdapter transactionAdapter;
     Integer language;
     CardView signUpButton;
     LinearLayout llSidepanelDetails, llSidepanelSignUp;
-    TextView txtSidepanelPhoneNumber, txtSidepanelUserName, txtSidepanelUserEmail,txtUserName,txtSidepanelProfile;
+    TextView txtSidepanelPhoneNumber, txtSidepanelUserName, txtSidepanelUserEmail, txtUserName, txtSidepanelProfile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -202,7 +212,7 @@ public class HomepageActivity extends AppCompatActivity {
         drawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
             @Override
             public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {
-                Log.d(TAG, "onDrawerSlide: " + slideOffset);
+//                Log.d(TAG, "onDrawerSlide: " + slideOffset);
                 llSidebarBg.setAlpha(slideOffset);
             }
 
@@ -485,6 +495,8 @@ public class HomepageActivity extends AppCompatActivity {
                 return true;
             }
         });
+//        postAllIsBacked();
+//        syncLists();
     }
 
     private void refineKhataIds() {
@@ -547,7 +559,12 @@ public class HomepageActivity extends AppCompatActivity {
                 manipulateAllTransactionFragment(true);
             } else if (item.getItemId() == R.id.back_up_on_account) {
                 Log.d(TAG, "NavClick: 2");
-                manipulateLoginFragment(true);
+                if (SessionManagement.userId != null) {
+                    backupAllTransactions();
+                } else {
+                    Toast.makeText(getApplicationContext(), "Login or signUp before back up", Toast.LENGTH_SHORT).show();
+                    manipulateLoginFragment(true);
+                }
             } else if (item.getItemId() == R.id.logout) {
                 Log.d(TAG, "NavClick: 3");
                 logout();
@@ -570,6 +587,8 @@ public class HomepageActivity extends AppCompatActivity {
                 retrieveDataFromLocal();
             } else if (item.getItemId() == R.id.transfer_all_data) {
                 retrieveFromSheet();
+            } else if (item.getItemId() == R.id.restore_all_data) {
+                getAllTransactions();
             } else if (item.getItemId() == R.id.upload_on_excel) {
                 calcAllStatsInfo();
 //                    initialiseStatsInfoRecyclerView();
@@ -591,8 +610,9 @@ public class HomepageActivity extends AppCompatActivity {
             sessionManagement.clearSession();
         }
     }
+
     public void loggedIn() {
-        SessionManagement sessionManagement=new SessionManagement(this);
+        SessionManagement sessionManagement = new SessionManagement(this);
         sessionManagement.getSession();
         if (SessionManagement.userId != null) {
             llSidepanelDetails.setVisibility(View.VISIBLE);
@@ -600,7 +620,7 @@ public class HomepageActivity extends AppCompatActivity {
             txtSidepanelPhoneNumber.setText(SessionManagement.userId);
             txtSidepanelUserName.setText(SessionManagement.userName);
             txtSidepanelUserEmail.setText(SessionManagement.userImage);
-            txtUserName.setText("Hello , "+SessionManagement.userName);
+            txtUserName.setText("Hello , " + SessionManagement.userName);
         } else {
             llSidepanelDetails.setVisibility(View.GONE);
             llSidepanelSignUp.setVisibility(View.VISIBLE);
@@ -749,7 +769,7 @@ public class HomepageActivity extends AppCompatActivity {
 //    }
 
     public void initialiseTransactionRecyclerView() {
-        transactionAdapter = new TransactionAdapter(transactionModelList, this);
+        transactionAdapter = new TransactionAdapter(transactionModelList, this, Tags.KEY_HOME);
         rvRecents.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         rvRecents.setAdapter(transactionAdapter);
         Log.d(TAG, "initialiseTransactionRecyclerView: ....");
@@ -785,6 +805,11 @@ public class HomepageActivity extends AppCompatActivity {
             txtAllTransaction.setText(resources.getString(R.string.view_all));
             txtLanguage.setText(resources.getString(R.string.current_language));
         }
+    }
+
+    private void syncLists() {
+        Log.d(TAG, "syncLists: forceBackUp if ");
+        addTransactionInList(transactionModelList, transactionModelList, "");
     }
 
     public void addTransactionInList(List<TransactionModel> transactionList, List<TransactionModel> specifyModelList, String keyAddTransaction) {
@@ -1069,82 +1094,227 @@ public class HomepageActivity extends AppCompatActivity {
         Log.d(TAG, "calcAllStatsInfo: hmStatsInfo.get(Current) : " + dateString + " : " + hmStatsInfo.get(dateString));
 
     }
-//    private void getDataFromAPI() {
-//
-//        // creating a string variable for URL.
-//        String url = "https://spreadsheets.google.com/feeds/list/1AOOaz-5PhVgIvfROammZsdUs92PdYhEUgGoDrYlGGhc/od6/public/values?alt=json";
-//        // creating a new variable for our request queue
-//        RequestQueue queue = Volley.newRequestQueue(MainActivity.this);
-//
-//        // creating a variable for our JSON object request and passing our URL to it.
-//        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
-//            @Override
-//            public void onResponse(JSONObject response) {
-//                loadingPB.setVisibility(View.GONE);
-//                try {
-//                    JSONObject feedObj = response.getJSONObject("feed");
-//                    JSONArray entryArray = feedObj.getJSONArray("entry");
-//                    for(int i=0; i<entryArray.length(); i++){
-//                        JSONObject entryObj = entryArray.getJSONObject(i);
-//                        String firstName = entryObj.getJSONObject("gsx$firstname").getString("$t");
-//                        String lastName = entryObj.getJSONObject("gsx$lastname").getString("$t");
-//                        String email = entryObj.getJSONObject("gsx$email").getString("$t");
-//                        String avatar = entryObj.getJSONObject("gsx$avatar").getString("$t");
-//                        userModalArrayList.add(new UserModal(firstName, lastName, email, avatar));
-//
-//                        // passing array list to our adapter class.
-//                        userRVAdapter = new UserRVAdapter(userModalArrayList, MainActivity.this);
-//
-//                        // setting layout manager to our recycler view.
-//                        userRV.setLayoutManager(new LinearLayoutManager(MainActivity.this));
-//
-//                        // setting adapter to our recycler view.
-//                        userRV.setAdapter(userRVAdapter);
-//                    }
-//
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
-//
-//            }
-//        }, new Response.ErrorListener() {
-//            @Override
-//            public void onErrorResponse(VolleyError error) {
-//                // handling on error listener method.
-//                Toast.makeText(HomepageActivity.this, "Fail to get data..", Toast.LENGTH_SHORT).show();
-//            }
-//        });
-//        // calling a request queue method
-//        // and passing our json object
-//        queue.add(jsonObjectRequest);
-//    }
-    public void backupOnCloud(TransactionModel transactionModel){
+
+    public void forceBackup() {
+        //delete all transactions from db
+        deleteAllTransactions();
+        //put all transactions as isbackedUp=false
+        postAllIsBacked();
+        //syncLists
+        syncLists();
+        //backup again
+        backupAllTransactions();
+    }
+
+    public void backupAllTransactions() {
+        Log.d(TAG, "backupAllTransactions: forceBackUp entered if");
+        needForceBackedUp = true;
+        backupCountTrans = 0;
+        backedUpSuccessTrans = 0;
+        Log.d(TAG, "backupAllTransactions: transactionModelList.size()" + transactionModelList.size());
+        Log.d(TAG, "backupAllTransactions: salesTransactionModelList.size()" + salesTransactionModelList.size());
+        Log.d(TAG, "backupAllTransactions: khataTransactionModelList.size()" + khataTransactionModelList.size());
+        Log.d(TAG, "backupAllTransactions: collectionTransactionModelList.size()" + collectionTransactionModelList.size());
+        Log.d(TAG, "backupAllTransactions: paymentTransactionModelList.size()" + paymentTransactionModelList.size());
+        for (int i = 0; i < transactionModelList.size(); i++) {
+            if (!transactionModelList.get(i).isBackedUp()) {
+                backupCountTrans++;
+                needForceBackedUp = false;
+                Log.d(TAG, "backupAllTransactions: which is not backed : " + transactionModelList.get(i).getUserName());
+                backupTransactionOnCloud(transactionModelList.get(i), i);
+            }
+        }
+        //show a dialog box for force backup.
+        if (needForceBackedUp) {
+            showBackupConfirmationDialog();
+        }
+    }
+
+    private void backupTransactionOnCloud(TransactionModel transactionModel, int pos) {
         RevampRetrofit revampRetrofit = new RevampRetrofit();
 
-        String url = Tags.URL_LOGIN; // Replace with your endpoint
+        String url = Tags.URL_ADD_TRANSACTION; // Replace with your endpoint
         HashMap<String, Object> data = new HashMap<>();  // Replace with your actual data object
-//        data.put(Tags.KEY_NAME, transactionModel.getUserName());
+        data.put(Tags.KEY_USERNAME, transactionModel.getUserName());
+        data.put(Tags.KEY_NAME, transactionModel.getUserName());
 //        data.put(Tags.KEY_PASSWORD, password);
-        Log.d(TAG, " userName :: " + transactionModel.getUserName());
+        Log.d(TAG, " getTransaction :: " + transactionModel.getTransaction() + " : " + transactionModel.getDate());
         revampRetrofit.postDataTransaction(url, transactionModel, new ResponseListener() {
             @Override
-            public void onSuccess(ResponseBody responseBody) throws IOException {
-                Log.d(TAG, "onSuccess : Response: Transaction is done" + responseBody);
-                TransactionModel transactionModel1 = TransactionModel.transactionResponseToTransactionModel(responseBody);
-                Log.d(TAG, "onSuccess: transaction is : "+transactionModel1.getUserName());
+            public void onSuccess(ResponseBody responseBody) throws IOException, JSONException {
+                String responseString = responseBody.string();
+                JSONObject jsonObject = new JSONObject(responseString);
+                Log.d(TAG, "onSuccess : Response: Transaction is done : " + jsonObject.toString());
+                TransactionModel transactionModel1 = TransactionModel.transactionJSONToTransactionModel(jsonObject);
+                Log.d(TAG, "onSuccess: transaction is : " + transactionModel1.getTransaction());
+                backedUpSuccessTrans++;
+                Log.d(TAG, "onSuccess: transaction is : pos" + backedUpSuccessTrans + " :: " + backupCountTrans);
+                transactionModelList.get(pos).setBackedUp(true);
+                if (backedUpSuccessTrans == backupCountTrans) {
+                    Toast.makeText(getApplicationContext(), "Backed up successfully", Toast.LENGTH_SHORT).show();
+                    syncLists();
+                }
             }
 
             @Override
-            public void onFailure(ResponseBody responseBody) throws IOException {
+            public void onFailure(ResponseBody responseBody) throws IOException, JSONException {
                 Log.e(TAG, "onFailure Failed: " + responseBody);
-                Toast.makeText(getApplicationContext(), responseBody.string(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Failed to add transaction", Toast.LENGTH_SHORT).show();
+//                String responseString = responseBody.string();
+//                JSONObject jsonObject = new JSONObject(responseString);
             }
 
             @Override
             public void onRequestFailed(String message) {
                 Log.e(TAG, "onRequestFailed : Request Failure: " + message);
-                Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Failed to add transaction on request", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    public void backupKhataOnCloud(KhataModel khataModel) {
+        RevampRetrofit revampRetrofit = new RevampRetrofit();
+
+        String url = Tags.URL_ADD_KHATA; // Replace with your endpoint
+        Log.d(TAG, "backupKhataOnCloud: " + khataModel.getKhataBalance() + " : " + khataModel.getKhataSerialNumber() + " : " + khataModel.getKhataUserIdString() + " : " + khataModel.getKhataUserName() + " : " + khataModel.getKhataUserPhone() + " : " + SessionManagement.userId);
+//        HashMap<String, Object> data = new HashMap<>();  // Replace with your actual data object
+//        data.put(Tags.KEY_USERNAME, transactionModel.getUserName());
+//        data.put(Tags.KEY_NAME, transactionModel.getUserName());
+//        data.put(Tags.KEY_PASSWORD, password);
+//        Log.d(TAG, " getTransaction :: " + transactionModel.getTransaction() + " : " + transactionModel.getDate());
+        revampRetrofit.postDataKhata(url, khataModel, new ResponseListener() {
+            @Override
+            public void onSuccess(ResponseBody responseBody) throws IOException, JSONException {
+                String responseString = responseBody.string();
+                JSONObject jsonObject = new JSONObject(responseString);
+                Log.d(TAG, "onSuccess : Response: Transaction is done : " + jsonObject.toString());
+                KhataModel khataModel1 = KhataModel.khataJSONToKhataModel(jsonObject);
+                Log.d(TAG, "onSuccess: transaction is : " + khataModel1.getKhataSerialNumber());
+                backedUpSuccessKhata++;
+                Log.d(TAG, "onSuccess: transaction is : pos" + backedUpSuccessKhata + " :: " + backupCountKhata);
+//                transactionModelList.get(pos).setBackedUp(true);
+                if (backedUpSuccessKhata == backupCountKhata) {
+                    Toast.makeText(getApplicationContext(), "Backed up successfully", Toast.LENGTH_SHORT).show();
+//                    syncLists();
+                }
+            }
+
+            @Override
+            public void onFailure(ResponseBody responseBody) throws IOException, JSONException {
+                Log.e(TAG, "onFailure Failed: " + responseBody);
+                Toast.makeText(getApplicationContext(), "Failed to add transaction", Toast.LENGTH_SHORT).show();
+//                String responseString = responseBody.string();
+//                JSONObject jsonObject = new JSONObject(responseString);
+            }
+
+            @Override
+            public void onRequestFailed(String message) {
+                Log.e(TAG, "onRequestFailed : Request Failure: " + message);
+                Toast.makeText(getApplicationContext(), "Failed to add transaction on request", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void getAllTransactions() {
+        Log.d(TAG, "deleteAllTransactions: entered forceBackUp");
+        RevampRetrofit revampRetrofit = new RevampRetrofit();
+        String url = Tags.URL_GET_TRANSACTIONS; // Replace with your endpoint
+        HashMap<String, Object> data = new HashMap<>();  // Replace with your actual data object
+        data.put(Tags.KEY_USERID, SessionManagement.userId);
+        revampRetrofit.getData(url, data, new ResponseListener() {
+            @Override
+            public void onSuccess(ResponseBody responseBody) throws IOException, JSONException {
+                String responseString = responseBody.string();
+                JSONArray transactionArray = new JSONArray(responseString);
+                Log.d(TAG, "onSuccess : Response: Transaction is done : " + transactionArray.toString());
+                List<TransactionModel> transactionModelList1 = TransactionModel.transactionResponseToTransactionModelList(transactionArray);
+                Log.d(TAG, "onSuccess: transactionModelList1.size() " + transactionModelList1.size());
+            }
+
+            @Override
+            public void onFailure(ResponseBody responseBody) throws IOException, JSONException {
+                Log.e(TAG, "onFailure Failed: " + responseBody);
+                Toast.makeText(getApplicationContext(), "Unable to delete transactions", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onRequestFailed(String message) {
+                Log.e(TAG, "onRequestFailed : Request Failure: " + message);
+                Toast.makeText(getApplicationContext(), "Unable to delete transactions on request", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void deleteAllTransactions() {
+        Log.d(TAG, "deleteAllTransactions: entered forceBackUp");
+        RevampRetrofit revampRetrofit = new RevampRetrofit();
+        String url = Tags.URL_DELETE_TRANSACTIONS; // Replace with your endpoint
+        HashMap<String, Object> data = new HashMap<>();  // Replace with your actual data object
+        data.put(Tags.KEY_USERID, SessionManagement.userId);
+        revampRetrofit.deleteTransactions(url, data, new ResponseListener() {
+            @Override
+            public void onSuccess(ResponseBody responseBody) throws IOException, JSONException {
+                String responseString = responseBody.string();
+                JSONObject jsonObject = new JSONObject(responseString);
+                Log.d(TAG, "onSuccess : Response: Transaction is done : " + jsonObject.toString());
+            }
+
+            @Override
+            public void onFailure(ResponseBody responseBody) throws IOException, JSONException {
+                Log.e(TAG, "onFailure Failed: " + responseBody);
+                Toast.makeText(getApplicationContext(), "Unable to delete transactions", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onRequestFailed(String message) {
+                Log.e(TAG, "onRequestFailed : Request Failure: " + message);
+                Toast.makeText(getApplicationContext(), "Unable to delete transactions on request", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void postAllIsBacked() {
+        Log.d(TAG, "postAllIsBacked: forceBackUp entered");
+        for (int i = 0; i < transactionModelList.size(); i++) {
+//            if (transactionModelList.get(i).getUserId()==null){
+            transactionModelList.get(i).setUserId(SessionManagement.userId);
+//            }
+            transactionModelList.get(i).setBackedUp(false);
+        }
+    }
+
+    // Method to show confirmation dialog
+    public void showBackupConfirmationDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Confirmation");
+        builder.setMessage("Are you sure you want to do a force back up?");
+
+        // "Yes" button
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Handle the "Yes" action
+                forceBackup();
+            }
+        });
+
+        // "No, cancel" button
+        builder.setNegativeButton("No, cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Dismiss the dialog
+                dialog.dismiss();
+            }
+        });
+
+        // Show the dialog
+        AlertDialog dialog = builder.create();
+        dialog.show();
+        Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+        positiveButton.setTextColor(this.getColor(R.color.increasing_green)); // Red color for "Yes"
+
+        Button negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+        negativeButton.setTextColor(this.getColor(R.color.decreasing_red)); // Blue color for "No, cancel"
+
     }
 }

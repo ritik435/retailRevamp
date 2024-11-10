@@ -15,7 +15,7 @@ import okhttp3.ResponseBody;
 public interface ResponseListener {
     public void onSuccess(ResponseBody responseBody) throws IOException, JSONException;
 
-    public void onFailure(ResponseBody responseBody) throws IOException;
+    public void onFailure(ResponseBody responseBody) throws IOException, JSONException;
 
     public void onRequestFailed(String message);
 }

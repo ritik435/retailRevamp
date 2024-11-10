@@ -28,6 +28,7 @@ import com.neotechInnovations.retailrevamp.R;
 import com.neotechInnovations.retailrevamp.Utils.SessionManagement;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -331,8 +332,10 @@ public class LoginFragment extends Fragment {
         revampRetrofit.postData(url, data, new ResponseListener() {
             @Override
             public void onSuccess(ResponseBody responseBody) throws IOException, JSONException {
+                String responseString = responseBody.string();
+                JSONObject jsonObject = new JSONObject(responseString);
                 Log.d(TAG, "Response: " + responseBody.string());
-                UserModel userModel = UserModel.userResponseToUserModel(responseBody);
+                UserModel userModel = UserModel.userJSONToUserModel(jsonObject);
                 Log.d(TAG, "onSuccess: signupUser userModel : " + userModel.getName());
                 SessionManagement sessionManagement = new SessionManagement(activity);
                 SessionManagement.saveSession(userModel.getId(), userModel.getName(), userModel.getName());
