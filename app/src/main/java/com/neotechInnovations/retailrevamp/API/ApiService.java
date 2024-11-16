@@ -30,6 +30,6 @@ public interface ApiService {
     @POST()
     Call<ResponseBody> postData(@Url String url, @Body KhataModel khataModel);
     @DELETE()
-    Call<ResponseBody> deleteTransactions(@Url String url, @QueryMap  HashMap<String, Object> hashMap);
+    Call<ResponseBody> deleteData(@Url String url, @QueryMap  HashMap<String, Object> hashMap);
 
 }

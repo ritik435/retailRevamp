@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class KhataModel implements Serializable {
-    UUID khataUserId;
+//    UUID khataUserId;
     String khataUserIdString;
     String khataSerialNumber;
     String khataUserName;
@@ -21,6 +21,42 @@ public class KhataModel implements Serializable {
     int khataBalance;
     String khataUserPhone;
     JSONArray khataTransactions;
+    String userId;
+    boolean edited;
+    boolean deleted;
+    boolean backedUp;
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public boolean isEdited() {
+        return edited;
+    }
+
+    public void setEdited(boolean edited) {
+        this.edited = edited;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
+
+    public boolean isBackedUp() {
+        return backedUp;
+    }
+
+    public void setBackedUp(boolean backedUp) {
+        this.backedUp = backedUp;
+    }
 
     public int getKhataBalance() {
         return khataBalance;
@@ -45,15 +81,6 @@ public class KhataModel implements Serializable {
     public void setKhataSerialNumber(String khataSerialNumber) {
         this.khataSerialNumber = khataSerialNumber;
     }
-
-    public UUID getKhataUserId() {
-        return khataUserId;
-    }
-
-    public void setKhataUserId(UUID khataUserId) {
-        this.khataUserId = khataUserId;
-    }
-
     public String getKhataUserName() {
         return khataUserName;
     }

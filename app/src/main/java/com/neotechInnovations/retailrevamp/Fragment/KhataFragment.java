@@ -117,7 +117,7 @@ public class KhataFragment extends Fragment {
         sbSerialNumber.append(" ) ",new StyleSpan(Typeface.NORMAL),Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         txtKhataUserSerialNumber.setText(sbSerialNumber);
         txtKhataUserPhone.setText(khataModel.getKhataUserPhone());
-        Log.d(TAG, "manipulateViews: khataModel ID : "+khataModel.getKhataUserId());
+//        Log.d(TAG, "manipulateViews: khataModel ID : "+khataModel.getKhataUserId());
         ivBackBtn.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {

@@ -31,11 +31,11 @@ import com.neotechInnovations.retailrevamp.Adapter.KhataAdapter;
 import com.neotechInnovations.retailrevamp.Constant.Tags;
 import com.neotechInnovations.retailrevamp.Model.KhataModel;
 import com.neotechInnovations.retailrevamp.R;
+import com.neotechInnovations.retailrevamp.Utils.SessionManagement;
 import com.neotechInnovations.retailrevamp.Utils.SharedPreference;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -272,7 +272,8 @@ public class CreateKhataFragment extends Fragment {
         khataModel.setKhataSerialNumber(serialNumber);
         khataModel.setKhataUserName(userName);
         khataModel.setKhataUserPhone(phoneNumber);
-        khataModel.setKhataUserId(UUID.randomUUID());
+//        khataModel.setKhataUserId(UUID.randomUUID());
+        khataModel.setUserId(SessionManagement.userId);
 
         String khatauserIdString = "";
         khatauserIdString += "(#";
@@ -280,6 +281,7 @@ public class CreateKhataFragment extends Fragment {
         khatauserIdString += ") ";
         khatauserIdString += userName;
         khataModel.setKhataUserIdString(khatauserIdString);
+        khataModel.setUserId(SessionManagement.userId);
 
         khataModelList.add(khataModel);
         HomepageActivity.suggestedKhataList.add(khataModel.getKhataUserIdString());
@@ -303,7 +305,7 @@ public class CreateKhataFragment extends Fragment {
 //        rvAllKhata.postDelayed(()->{
 //            rvAllKhata.setNestedScrollingEnabled(false);
 //        },5000);
-
+//        ((HomepageActivity)activity).backupKhataOnCloud(khataModel);
         HomepageActivity.newKhataList = khataModelList;
         saveInLocal(khataModelList);
         resetCreateKhata();

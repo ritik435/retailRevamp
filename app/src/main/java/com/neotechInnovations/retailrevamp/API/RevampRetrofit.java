@@ -65,8 +65,8 @@ public class RevampRetrofit {
             }
         });
     }
-    public void deleteTransactions(String url, HashMap<String, Object> data, ResponseListener responseListner) {
-        Call<ResponseBody> call = apiService.deleteTransactions(url, data);
+    public void deleteData(String url, HashMap<String, Object> data, ResponseListener responseListner) {
+        Call<ResponseBody> call = apiService.deleteData(url, data);
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
@@ -104,6 +104,45 @@ public class RevampRetrofit {
             }
         });
     }
+//    public void deleteKhatas(String url, HashMap<String, Object> data, ResponseListener responseListner) {
+//        Call<ResponseBody> call = apiService.deleteData(url, data);
+//        call.enqueue(new Callback<ResponseBody>() {
+//            @Override
+//            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+//                Log.d(TAG, "onResponse: called");
+//                if (!response.isSuccessful()) {
+//                    try {
+////                    if(response.code() == Tags.STATUS_CODE_503){
+//                        responseListner.onFailure(response.body());
+////                    }
+////                    else {
+////                        responseListner.onRequestFailed(Tags.TRY_AGAIN);
+////                    }
+//                    } catch (IOException | JSONException e) {
+//                        Log.e(TAG, "onResponse: postData response :: "+response.toString(), e);
+//                    }
+//                } else {
+//                    Log.d(TAG, "onResponse: response first " + response);
+//                    try {
+//                        responseListner.onSuccess(response.body());
+//                        Log.d(TAG, "onResponse: reponse got" + response.body().string());
+//                    } catch (IOException e) {
+//                        Log.d(TAG, "onResponse: " + e.getMessage());
+//                        e.printStackTrace();
+//                    } catch (JSONException e) {
+//                        Log.d(TAG, "onResponse: 2" + e.getMessage());
+//                        e.printStackTrace();
+//                    }
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<ResponseBody> call, Throwable t) {
+//                Log.d(TAG, "onFailure: " + t.getMessage());
+//                responseListner.onRequestFailed(t.getMessage());
+//            }
+//        });
+//    }
 
     public void postDataTransaction(String url, TransactionModel transactionModel, ResponseListener responseListner) {
         Call<ResponseBody> call = apiService.postData(url, transactionModel);
