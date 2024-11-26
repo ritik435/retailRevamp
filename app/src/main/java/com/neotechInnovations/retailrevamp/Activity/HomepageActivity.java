@@ -1177,7 +1177,7 @@ public class HomepageActivity extends AppCompatActivity {
         if (!transactionModel.getTransaction()){
             position[0]--;
             if (position[0] <0) {
-                Toast.makeText(getApplicationContext(), "Backed up successfully", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Backed up transaction successfully: "+backedUpSuccessTrans , Toast.LENGTH_SHORT).show();
                 syncLists();
                 return;
             }
@@ -1205,7 +1205,7 @@ public class HomepageActivity extends AppCompatActivity {
                 position[0]--;
                 Log.d(TAG, "onSuccess: BACKUPDONE transactionModelList.size() : "+transactionModelList.size()+" : position[0] : "+position[0]);
                 if (position[0] <0) {
-                    Toast.makeText(getApplicationContext(), "Backed up successfully", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Backed up transaction successfully : "+backedUpSuccessTrans, Toast.LENGTH_SHORT).show();
                     syncLists();
                 }else {
                     backupTransactionOnCloud(transactionModelList.get(position[0]), position[0]);
@@ -1255,7 +1255,7 @@ public class HomepageActivity extends AppCompatActivity {
                 position[0]--;
                 Log.d(TAG, "onSuccess: BACKUPDONE KHATA newKhataList.size() : "+newKhataList.size()+" : position[0] : "+position[0]);
                 if (position[0] <0) {
-                    Toast.makeText(getApplicationContext(), "Backed up successfully", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Backed up khata successfully : "+backedUpSuccessKhata, Toast.LENGTH_SHORT).show();
                     SharedPreference.savenNewKhataLists(newKhataList);
                 }else {
                     backupKhataOnCloud(newKhataList.get(position[0]), position[0]);
