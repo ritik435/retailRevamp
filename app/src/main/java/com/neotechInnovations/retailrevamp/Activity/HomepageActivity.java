@@ -102,6 +102,7 @@ public class HomepageActivity extends AppCompatActivity {
     public static List<TransactionModel> collectionTransactionModelList = new ArrayList<>();
     public static List<TransactionModel> paymentTransactionModelList = new ArrayList<>();
     public static List<TransactionModel> khataTransactionModelList = new ArrayList<>();
+    public static List<TransactionModel> specificTransactionModelsList = new ArrayList<>();
     public static List<KhataModel> newKhataList = new ArrayList<>();
     public static List<String> suggestedKhataList = new ArrayList<>();
     boolean needForceBackedUp = true;
@@ -113,6 +114,7 @@ public class HomepageActivity extends AppCompatActivity {
     CardView signUpButton;
     LinearLayout llSidepanelDetails, llSidepanelSignUp;
     TextView txtSidepanelPhoneNumber, txtSidepanelUserName, txtSidepanelUserEmail, txtUserName, txtSidepanelProfile;
+    public static boolean isDataBackedUp=false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -560,7 +562,8 @@ public class HomepageActivity extends AppCompatActivity {
             } else if (item.getItemId() == R.id.back_up_on_account) {
                 Log.d(TAG, "NavClick: 2");
                 if (SessionManagement.userId != null) {
-                    backupAllData();
+//                    backupAllData();
+                    forceBackup();
                 } else {
                     Toast.makeText(getApplicationContext(), "Login or signUp before back up", Toast.LENGTH_SHORT).show();
                     manipulateLoginFragment(true);
@@ -578,17 +581,18 @@ public class HomepageActivity extends AppCompatActivity {
                 manipulateCreateKhataFragment(true, Tags.KEY_VIEW_KHATA);
             } else if (item.getItemId() == R.id.erase_all_data) {
                 Log.d(TAG, "NavClick: 5");
-                SharedPreference.clearLists();
-                SharedPreference.clearNewKhataList();
-                hmStatsInfo.clear();
-                newKhataList.clear();
-                statsticsInfoAdapter.hmStatsInfo = hmStatsInfo;
-                statsticsInfoAdapter.notifyDataSetChanged();
-                retrieveDataFromLocal();
+                eraseAllData();
             } else if (item.getItemId() == R.id.transfer_all_data) {
                 retrieveFromSheet();
             } else if (item.getItemId() == R.id.restore_all_data) {
-                getAllTransactions();
+                if (SessionManagement.userId != null) {
+//                    backupAllData();
+                    restoreFromCloud();
+                } else {
+                    Toast.makeText(getApplicationContext(), "Login or signUp before restoring", Toast.LENGTH_SHORT).show();
+                    manipulateLoginFragment(true);
+                }
+//                restoreAllTransactions();
             } else if (item.getItemId() == R.id.upload_on_excel) {
                 calcAllStatsInfo();
 //                    initialiseStatsInfoRecyclerView();
@@ -602,6 +606,17 @@ public class HomepageActivity extends AppCompatActivity {
             llSidebarBg.setVisibility(View.GONE);
             return false;
         });
+    }
+
+    private void eraseAllData() {
+        Log.d(TAG, "eraseAllData: entereddd ");
+        SharedPreference.clearLists();
+        SharedPreference.clearNewKhataList();
+        hmStatsInfo.clear();
+        newKhataList.clear();
+        statsticsInfoAdapter.hmStatsInfo = hmStatsInfo;
+        statsticsInfoAdapter.notifyDataSetChanged();
+        retrieveDataFromLocal();
     }
 
     private void logout() {
@@ -828,13 +843,13 @@ public class HomepageActivity extends AppCompatActivity {
         } else if (keyAddTransaction.equals(Tags.KEY_ADD_PAYMENTS)) {
             paymentTransactionModelList = specifyModelList;
         }
-        saveInLocal(transactionList, specifyModelList, keyAddTransaction);
+        saveInLocal(transactionList);
         calcAllStatsInfo();
     }
 
-    private void saveInLocal(List<TransactionModel> transactionList, List<TransactionModel> specifyModelList, String keyAddTransaction) {
+    private void saveInLocal(List<TransactionModel> transactionList) {
         // Save the list to SharedPreferences
-        SharedPreference.saveLists(transactionList, collectionTransactionModelList, paymentTransactionModelList, salesTransactionModelList, khataTransactionModelList);
+        SharedPreference.saveLists(transactionModelList, collectionTransactionModelList, paymentTransactionModelList, salesTransactionModelList, khataTransactionModelList);
     }
 
     private void retrieveDataFromLocal() {
@@ -1097,6 +1112,10 @@ public class HomepageActivity extends AppCompatActivity {
     }
 
     public void forceBackup() {
+        if(transactionModelList.isEmpty()){
+            Toast.makeText(this,"Nothing is there to backup", Toast.LENGTH_SHORT).show();
+            return;
+        }
         //delete all transactions from db
         deleteAllTransactions();
         //delete all khata from db
@@ -1112,6 +1131,10 @@ public class HomepageActivity extends AppCompatActivity {
     }
 
     public void backupAllData() {
+        if(transactionModelList.isEmpty()){
+            Toast.makeText(this,"Nothing is there to backup", Toast.LENGTH_SHORT).show();
+            return;
+        }
         Log.d(TAG, "backupAllTransactions: forceBackUp entered if");
         needForceBackedUp = true;
         backupCountTrans = 0;
@@ -1123,22 +1146,24 @@ public class HomepageActivity extends AppCompatActivity {
         Log.d(TAG, "backupAllTransactions: khataTransactionModelList.size()" + khataTransactionModelList.size());
         Log.d(TAG, "backupAllTransactions: collectionTransactionModelList.size()" + collectionTransactionModelList.size());
         Log.d(TAG, "backupAllTransactions: paymentTransactionModelList.size()" + paymentTransactionModelList.size());
-        for (int i = 0; i < transactionModelList.size(); i++) {
-            if (!transactionModelList.get(i).isBackedUp()) {
+        for (int i = transactionModelList.size() - 1; i >= 0; i--) {
+            if (!transactionModelList.get(i).isBackedUp() && transactionModelList.get(i).getTransaction()) {
                 backupCountTrans++;
                 needForceBackedUp = false;
                 Log.d(TAG, "backupAllTransactions: which is not backed : " + transactionModelList.get(i).getUserName());
                 backupTransactionOnCloud(transactionModelList.get(i), i);
+                break;
             }
         }
-        for (int i = 0; i < newKhataList.size(); i++) {
-            KhataModel khataModel=newKhataList.get(i);
+        for (int i = newKhataList.size() - 1; i >= 0; i--) {
+            KhataModel khataModel = newKhataList.get(i);
             khataModel.setUserId(SessionManagement.userId);
             if (!khataModel.isBackedUp()) {
                 backupCountKhata++;
                 needForceBackedUp = false;
-                Log.d(TAG, "backupAllTransactions: which is not backed : " + khataModel.getKhataSerialNumber());
-                backupKhataOnCloud(khataModel,i);
+                Log.d(TAG, "backupAllTransactions::: which is not backed : " + khataModel.getKhataSerialNumber());
+                backupKhataOnCloud(khataModel, i);
+                break;
             }
         }
         //show a dialog box for force backup.
@@ -1148,14 +1173,24 @@ public class HomepageActivity extends AppCompatActivity {
     }
 
     private void backupTransactionOnCloud(TransactionModel transactionModel, int pos) {
+        final Integer[] position = {pos};
+        if (!transactionModel.getTransaction()){
+            position[0]--;
+            if (position[0] <0) {
+                Toast.makeText(getApplicationContext(), "Backed up successfully", Toast.LENGTH_SHORT).show();
+                syncLists();
+                return;
+            }
+            backupTransactionOnCloud(transactionModelList.get(position[0]), position[0]);
+            return;
+        }
         RevampRetrofit revampRetrofit = new RevampRetrofit();
-
         String url = Tags.URL_ADD_TRANSACTION; // Replace with your endpoint
         HashMap<String, Object> data = new HashMap<>();  // Replace with your actual data object
         data.put(Tags.KEY_USERNAME, transactionModel.getUserName());
         data.put(Tags.KEY_NAME, transactionModel.getUserName());
 //        data.put(Tags.KEY_PASSWORD, password);
-        Log.d(TAG, " getTransaction :: " + transactionModel.getTransaction() + " : " + transactionModel.getDate());
+        Log.d(TAG, " getTransaction backupTransactionOnCloud BACKUPLOGICTEST :: " + pos+"  : "+transactionModel.getUserName() + " : " + transactionModel.getDate());
         revampRetrofit.postDataTransaction(url, transactionModel, new ResponseListener() {
             @Override
             public void onSuccess(ResponseBody responseBody) throws IOException, JSONException {
@@ -1163,14 +1198,25 @@ public class HomepageActivity extends AppCompatActivity {
                 JSONObject jsonObject = new JSONObject(responseString);
                 Log.d(TAG, "onSuccess : Response: Transaction is done : " + jsonObject.toString());
                 TransactionModel transactionModel1 = TransactionModel.transactionJSONToTransactionModel(jsonObject);
-                Log.d(TAG, "onSuccess: transaction is : " + transactionModel1.getTransaction());
+                Log.d(TAG, "onSuccess: backupTransactionOnCloud transaction is : " + transactionModel1.getTransaction());
                 backedUpSuccessTrans++;
                 Log.d(TAG, "onSuccess: transaction is : pos" + backedUpSuccessTrans + " :: " + backupCountTrans);
                 transactionModelList.get(pos).setBackedUp(true);
-                if (backedUpSuccessTrans == backupCountTrans) {
+                position[0]--;
+                Log.d(TAG, "onSuccess: BACKUPDONE transactionModelList.size() : "+transactionModelList.size()+" : position[0] : "+position[0]);
+                if (position[0] <0) {
                     Toast.makeText(getApplicationContext(), "Backed up successfully", Toast.LENGTH_SHORT).show();
                     syncLists();
+                }else {
+                    backupTransactionOnCloud(transactionModelList.get(position[0]), position[0]);
                 }
+//                if (backedUpSuccessTrans == backupCountTrans) {
+//                    Toast.makeText(getApplicationContext(), "Backed up successfully", Toast.LENGTH_SHORT).show();
+//                    syncLists();
+//                }
+//                if ()
+//                pos++;
+//                    backupTransactionOnCloud(transactionModelList.get(pos), pos++);
             }
 
             @Override
@@ -1189,16 +1235,12 @@ public class HomepageActivity extends AppCompatActivity {
         });
     }
 
-    public void backupKhataOnCloud(KhataModel khataModel,int pos) {
+    public void backupKhataOnCloud(KhataModel khataModel, int pos) {
+        final Integer[] position = {pos};
         RevampRetrofit revampRetrofit = new RevampRetrofit();
 
         String url = Tags.URL_ADD_KHATA; // Replace with your endpoint
-        Log.d(TAG, "backupKhataOnCloud: " + khataModel.getKhataBalance() + " : " + khataModel.getKhataSerialNumber() + " : " + khataModel.getKhataUserIdString() + " : " + khataModel.getKhataUserName() + " : " + khataModel.getKhataUserPhone() + " : " + SessionManagement.userId);
-//        HashMap<String, Object> data = new HashMap<>();  // Replace with your actual data object
-//        data.put(Tags.KEY_USERNAME, transactionModel.getUserName());
-//        data.put(Tags.KEY_NAME, transactionModel.getUserName());
-//        data.put(Tags.KEY_PASSWORD, password);
-//        Log.d(TAG, " getTransaction :: " + transactionModel.getTransaction() + " : " + transactionModel.getDate());
+        Log.d(TAG, "backupKhataOnCloud: BACKUPLOGICTEST :: " + khataModel.getKhataBalance() + " : " + khataModel.getKhataSerialNumber() + " : " + khataModel.getKhataUserIdString() + " : " + khataModel.getKhataUserName() + " : " + khataModel.getKhataUserPhone() + " : " + SessionManagement.userId);
         revampRetrofit.postDataKhata(url, khataModel, new ResponseListener() {
             @Override
             public void onSuccess(ResponseBody responseBody) throws IOException, JSONException {
@@ -1210,9 +1252,13 @@ public class HomepageActivity extends AppCompatActivity {
                 backedUpSuccessKhata++;
                 Log.d(TAG, "onSuccess: transaction is : pos" + backedUpSuccessKhata + " :: " + backupCountKhata);
                 newKhataList.get(pos).setBackedUp(true);
-                if (backedUpSuccessKhata == backupCountKhata) {
+                position[0]--;
+                Log.d(TAG, "onSuccess: BACKUPDONE KHATA newKhataList.size() : "+newKhataList.size()+" : position[0] : "+position[0]);
+                if (position[0] <0) {
                     Toast.makeText(getApplicationContext(), "Backed up successfully", Toast.LENGTH_SHORT).show();
                     SharedPreference.savenNewKhataLists(newKhataList);
+                }else {
+                    backupKhataOnCloud(newKhataList.get(position[0]), position[0]);
                 }
             }
 
@@ -1232,8 +1278,71 @@ public class HomepageActivity extends AppCompatActivity {
         });
     }
 
-    private void getAllTransactions() {
-        Log.d(TAG, "deleteAllTransactions: entered forceBackUp");
+    public void restoreFromCloud() {
+        eraseAllData();
+        restoreAllTransactions();
+        restoreAllKhatas();
+        if (newKhataList.size()>0 || transactionModelList.size()>0){
+            isDataBackedUp=true;
+        }
+    }
+
+    private void divideTheList(String key, List<TransactionModel> transactionModelList, List<KhataModel> khataModelList) {
+        if (key.equals(Tags.KEY_TRANSACTIONS)) {
+//            this.transactionModelList = transactionModelList;
+            sortListOut(transactionModelList);
+            saveInLocal(transactionModelList);
+        } else if (key.equals(Tags.KEY_KHATA)) {
+            SharedPreference.savenNewKhataLists(khataModelList);
+        }
+        calcAllStatsInfo();
+    }
+
+    private void sortListOut(List<TransactionModel> transactionList) {
+        Log.d(TAG, "sortListOut: Entered checkAnotherTransaction " + transactionList.size());
+        transactionModelList = new ArrayList<>();
+        paymentTransactionModelList = new ArrayList<>();
+        collectionTransactionModelList = new ArrayList<>();
+        salesTransactionModelList = new ArrayList<>();
+        khataTransactionModelList = new ArrayList<>();
+        for (int i = transactionList.size() - 1; i >= 0; i--) {
+            TransactionModel transactionModel = transactionList.get(i);
+            Log.d(TAG, "sortListOut: sortListOut : GETDATEINSORT() : " + transactionModel.getDate().toString());
+            specificTransactionModelsList = null;
+            if (transactionModel.getTransaction()) {
+                Log.d(TAG, "sortListOut: checkAnotherTransaction: addedIn :: getKey :: " + transactionModel.getKey());
+                if (transactionModel.getKey().equals(Tags.KEY_ADD_PAYMENTS)) {
+                    specificTransactionModelsList = paymentTransactionModelList;
+                } else if (transactionModel.getKey().equals(Tags.KEY_ADD_COLLECTION)) {
+                    specificTransactionModelsList = collectionTransactionModelList;
+                } else if (transactionModel.getKey().equals(Tags.KEY_ADD_SALES)) {
+                    specificTransactionModelsList = salesTransactionModelList;
+                } else if (transactionModel.getKey().equals(Tags.KEY_ADD_ENTRY_IN_KHATA)) {
+                    specificTransactionModelsList = khataTransactionModelList;
+                }
+                boolean is0thElementAdded = checkAnotherTransaction(transactionModel);
+                if (specificTransactionModelsList != null) {
+                    specificTransactionModelsList.add(1, transactionModel);
+                }
+            }
+        }
+        for (int i = transactionList.size() - 1; i >= 0; i--) {
+            TransactionModel transactionModel = transactionList.get(i);
+            Log.d(TAG, "sortListOut: sortListOut : GETDATEINSORT() : " + transactionModel.getDate().toString());
+            specificTransactionModelsList = null;
+            if (transactionModel.getTransaction()) {
+                Log.d(TAG, "sortListOut: checkAnotherTransaction: addedIn :: getKey :: " + transactionModel.getKey());
+                    specificTransactionModelsList = transactionModelList;
+                boolean is0thElementAdded = checkAnotherTransaction(transactionModel);
+                if (specificTransactionModelsList != null) {
+                    specificTransactionModelsList.add(1, transactionModel);
+                }
+            }
+        }
+    }
+
+    private void restoreAllTransactions() {
+        Log.d(TAG, "deleteAllTransactions: restoreFromCloud restoreAllKhatas entered forceRestore");
         RevampRetrofit revampRetrofit = new RevampRetrofit();
         String url = Tags.URL_GET_TRANSACTIONS; // Replace with your endpoint
         HashMap<String, Object> data = new HashMap<>();  // Replace with your actual data object
@@ -1245,19 +1354,65 @@ public class HomepageActivity extends AppCompatActivity {
                 JSONArray transactionArray = new JSONArray(responseString);
                 Log.d(TAG, "onSuccess : Response: Transaction is done : " + transactionArray.toString());
                 List<TransactionModel> transactionModelList1 = TransactionModel.transactionResponseToTransactionModelList(transactionArray);
-                Log.d(TAG, "onSuccess: transactionModelList1.size() " + transactionModelList1.size());
+                Log.d(TAG, "onSuccess: restoreFromCloud transactionModelList1.size() " + transactionModelList1.size());
+                if (transactionModelList1.size()>0){
+                    Log.d(TAG, "onSuccess: GETDATEINSORT :: "+transactionModelList1.get(0).getDate());
+                }
+                Collections.reverse(transactionModelList1);
+//                transactionModelList = transactionModelList1;
+                divideTheList(Tags.KEY_TRANSACTIONS, transactionModelList1, new ArrayList<>());
+                alreadyBackedUp(transactionModelList);
+                initialiseTransactionRecyclerView();
             }
 
             @Override
             public void onFailure(ResponseBody responseBody) throws IOException, JSONException {
-                Log.e(TAG, "onFailure Failed: " + responseBody);
-                Toast.makeText(getApplicationContext(), "Unable to delete transactions", Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "onFailure restoreFromCloud Failed: " + responseBody);
+                Toast.makeText(getApplicationContext(), "Unable to restore transactions", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onRequestFailed(String message) {
-                Log.e(TAG, "onRequestFailed : Request Failure: " + message);
-                Toast.makeText(getApplicationContext(), "Unable to delete transactions on request", Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "onRequestFailed : restoreFromCloud Request Failure: " + message);
+                Toast.makeText(getApplicationContext(), "Unable to restore transactions on request", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void alreadyBackedUp(List<TransactionModel> transactionModelList) {
+        for(int i=0;i<transactionModelList.size();i++){
+            TransactionModel transactionModel=transactionModelList.get(i);
+            transactionModel.setBackedUp(true);
+        }
+    }
+
+    private void restoreAllKhatas() {
+        Log.d(TAG, "deleteAllTransactions: restoreFromCloud restoreAllKhatas entered forceRestore");
+        RevampRetrofit revampRetrofit = new RevampRetrofit();
+        String url = Tags.URL_GET_ALL_KHATA; // Replace with your endpoint
+        HashMap<String, Object> data = new HashMap<>();  // Replace with your actual data object
+        data.put(Tags.KEY_USERID, SessionManagement.userId);
+        revampRetrofit.getData(url, data, new ResponseListener() {
+            @Override
+            public void onSuccess(ResponseBody responseBody) throws IOException, JSONException {
+                String responseString = responseBody.string();
+                JSONArray khataArray = new JSONArray(responseString);
+                Log.d(TAG, "onSuccess : Response: Transaction is done : " + khataArray.toString());
+                List<KhataModel> kahtaModelList1 = KhataModel.khataResponseToKhataModelList(khataArray);
+                Log.d(TAG, "onSuccess: restoreFromCloud kahtaModelList1.size() " + kahtaModelList1.size());
+                divideTheList(Tags.KEY_KHATA, new ArrayList<>(), kahtaModelList1);
+            }
+
+            @Override
+            public void onFailure(ResponseBody responseBody) throws IOException, JSONException {
+                Log.e(TAG, "onFailure Failed: restoreFromCloud : : " + responseBody);
+                Toast.makeText(getApplicationContext(), "Unable to restore Khatas", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onRequestFailed(String message) {
+                Log.e(TAG, "onRequestFailed : Request Failure: restoreFromCloud :: " + message);
+                Toast.makeText(getApplicationContext(), "Unable to restore Khatas on request", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -1289,6 +1444,7 @@ public class HomepageActivity extends AppCompatActivity {
             }
         });
     }
+
     private void deleteAllTransactions() {
         Log.d(TAG, "deleteAllTransactions: entered forceBackUp");
         RevampRetrofit revampRetrofit = new RevampRetrofit();
@@ -1366,5 +1522,52 @@ public class HomepageActivity extends AppCompatActivity {
         Button negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
         negativeButton.setTextColor(this.getColor(R.color.decreasing_red)); // Blue color for "No, cancel"
 
+    }
+
+    private boolean checkAnotherTransaction(TransactionModel specificTransaction) {
+        Log.d(TAG, "checkAnotherTransaction: enterred... ");
+        SimpleDateFormat dateFormat = new SimpleDateFormat(Tags.DATE_FORMAT, Locale.getDefault());
+        // Convert Timestamp to Date object
+        Date currentDate = new Date(specificTransaction.getDate().getTime());
+        Date latestEntryDate = null;
+        Date latestEntrySpecificDate = null;
+        String latestEntryDateString = "";
+        String latestEntrySpecificDateString = "";
+        Log.d(TAG, "checkAnotherTransaction 1: ");
+        try {
+            Log.d(TAG, "checkAnotherTransaction 1 a): " + specificTransactionModelsList.get(0).getDate().toString());
+            TransactionModel specificTransactionModel = specificTransactionModelsList.get(0);
+            latestEntrySpecificDate = new Date(specificTransactionModel.getDate().getTime());
+            latestEntrySpecificDateString = dateFormat.format(latestEntrySpecificDate);
+        } catch (Exception e) {
+            Log.d(TAG, "checkAnotherTransaction: " + e.getMessage());
+        }
+        Log.d(TAG, "checkAnotherTransaction 2: ");
+        // Format the Date object into a string
+        String currentdateString = dateFormat.format(currentDate);
+        String currentdateSpecificString = dateFormat.format(currentDate);
+
+        TransactionModel transactionModel = new TransactionModel();
+        transactionModel.setDate(specificTransaction.getDate());
+        transactionModel.setTransaction(false);
+        transactionModel.setBackedUp(false);
+        transactionModel.setUserId(SessionManagement.userId);
+        Log.d(TAG, "checkAnotherTransaction COMPARINGDATES 3 a) : currentDateString" + currentdateString + " latestEntrySpecificDateString : " + latestEntrySpecificDateString);
+
+        if ((specificTransactionModelsList != null && !specificTransactionModelsList.isEmpty()) && currentdateString.equals(latestEntrySpecificDateString)) { //&& !specificTransactionModelsList.get(0).getTransaction()
+            //then do nothing
+            Log.d(TAG, "checkAnotherTransaction: FALSEEEE addedIn which list : " + specificTransaction.getUserName());
+            return false;
+        } else {
+            Log.d(TAG, "checkAnotherTransaction: TRUEEE addedIn which list : " + specificTransaction.getUserName());
+            //if not then make new entry of date sequence at 0th element.
+            if (specificTransactionModelsList == null) {
+                specificTransactionModelsList = new ArrayList<>();
+            }
+            specificTransactionModelsList.add(0, transactionModel);
+            Log.d(TAG, "checkAnotherTransaction: is added in transaction and specific Transaction ... specificTransactionModelList: " + specificTransactionModelsList.size());
+            return true;
+        }
+//        Log.d(TAG, "checkAnotherTransaction 3 b ) : currentDateString" + currentdateString + " latestEntryDateString : " + latestEntryDateString);
     }
 }

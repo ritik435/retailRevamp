@@ -239,28 +239,30 @@ public class LoginFragment extends Fragment {
         HashMap<String, Object> data = new HashMap<>();  // Replace with your actual data object
         data.put(Tags.KEY_NAME, userName);
         data.put(Tags.KEY_PASSWORD, password);
-        Log.d(TAG, " userName :: " + userName);
+        Log.d(TAG, " Loginuser userName :: " + userName);
         revampRetrofit.getData(url, data, new ResponseListener() {
             @Override
             public void onSuccess(ResponseBody responseBody) throws IOException {
-                Log.d(TAG, "Response: " + responseBody);
+                Log.d(TAG, " Loginuser Response: " + responseBody);
                 UserModel userModel = UserModel.userResponseToUserModel(responseBody);
                 Log.d(TAG, "onSuccess: Loginuser userModel : " + userModel.getName());
                 SessionManagement sessionManagement = new SessionManagement(activity);
                 SessionManagement.saveSession(userModel.getId(), userModel.getName(), userModel.getName());
                 sessionManagement.getSession();
-                Log.d(TAG, "onSuccess: Successfully logged In : " + SessionManagement.userName);
+                Log.d(TAG, "onSuccess: Loginuser Successfully logged In : " + SessionManagement.userName);
                 Toast.makeText(activity, "Welcome " + SessionManagement.userName, Toast.LENGTH_SHORT).show();
                 loggedInSuccessfully();
                 clearForm();
+
                 pbLogin.setVisibility(View.GONE);
                 btnLogin.setVisibility(View.VISIBLE);
                 ((HomepageActivity) activity).loggedIn();
+                ((HomepageActivity) activity).restoreFromCloud();
             }
 
             @Override
             public void onFailure(ResponseBody responseBody) throws IOException {
-                Log.e(TAG, "Failed: " + responseBody);
+                Log.e(TAG, "Failed: Loginuser " + responseBody);
                 Toast.makeText(activity, responseBody.string(), Toast.LENGTH_SHORT).show();
                 pbLogin.setVisibility(View.GONE);
                 btnLogin.setVisibility(View.VISIBLE);
@@ -268,7 +270,7 @@ public class LoginFragment extends Fragment {
 
             @Override
             public void onRequestFailed(String message) {
-                Log.e(TAG, "Request Failure: " + message);
+                Log.e(TAG, "Request Failure: Loginuser " + message);
                 Toast.makeText(activity, message, Toast.LENGTH_SHORT).show();
                 pbLogin.setVisibility(View.GONE);
                 btnLogin.setVisibility(View.VISIBLE);

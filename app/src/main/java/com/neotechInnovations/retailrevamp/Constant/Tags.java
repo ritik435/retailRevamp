@@ -23,6 +23,8 @@ public class Tags {
     public static String KEY_ADD_COLLECTION="addCollection";
     public static String KEY_CREATE_KHATA="createKhata";
     public static String KEY_VIEW_KHATA="viewKhata";
+    public static String KEY_KHATA="khata";
+    public static String KEY_TRANSACTIONS="transactions";
     public static String KEY_DEBIT="debit";
     public static String KEY_CREDIT="credit";
     public static String KEY_ONLINE="online";
@@ -48,6 +50,7 @@ public class Tags {
     public static String URL_ADD_TRANSACTION="https://retail-revamp-backend.vercel.app/api/transaction/add-transaction";
     public static String URL_DELETE_TRANSACTIONS="https://retail-revamp-backend.vercel.app/api/transaction/delete-transactions";
     public static String URL_GET_TRANSACTIONS="https://retail-revamp-backend.vercel.app/api/transaction/get-transactions";
+    public static String URL_GET_ALL_KHATA="https://retail-revamp-backend.vercel.app/api/khata/get-khata";
     public static String URL_ADD_KHATA="https://retail-revamp-backend.vercel.app/api/khata/add-khata";
     public static String URL_DELETE_KHATAS="https://retail-revamp-backend.vercel.app/api/khata/delete-khatas";
 

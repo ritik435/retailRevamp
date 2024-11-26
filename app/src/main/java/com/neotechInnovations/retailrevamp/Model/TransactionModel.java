@@ -3,6 +3,7 @@ package com.neotechInnovations.retailrevamp.Model;
 import android.util.Log;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -171,8 +172,10 @@ public class TransactionModel {
     }
     public static List<TransactionModel> transactionResponseToTransactionModelList(JSONArray transactionArray) throws IOException, JSONException {
         List<TransactionModel> transactionList = new ArrayList<>();
-        Gson gson = new Gson();
-
+//        Gson gson = new Gson();
+        Gson gson = new GsonBuilder()
+                .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'") // Use the exact date format from your JSON
+                .create();
         for (int i = 0; i < transactionArray.length(); i++) {
             JSONObject transactionObject = transactionArray.getJSONObject(i);
             TransactionModel transaction = gson.fromJson(transactionObject.toString(), TransactionModel.class);
