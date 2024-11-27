@@ -1398,9 +1398,11 @@ public class HomepageActivity extends AppCompatActivity {
                 String responseString = responseBody.string();
                 JSONArray khataArray = new JSONArray(responseString);
                 Log.d(TAG, "onSuccess : Response: Transaction is done : " + khataArray.toString());
-                List<KhataModel> kahtaModelList1 = KhataModel.khataResponseToKhataModelList(khataArray);
-                Log.d(TAG, "onSuccess: restoreFromCloud kahtaModelList1.size() " + kahtaModelList1.size());
-                divideTheList(Tags.KEY_KHATA, new ArrayList<>(), kahtaModelList1);
+                List<KhataModel> khataModelList1 = KhataModel.khataResponseToKhataModelList(khataArray);
+                Log.d(TAG, "onSuccess: restoreFromCloud khataModelList1.size() " + khataModelList1.size());
+                Collections.reverse(khataModelList1);
+                newKhataList=khataModelList1;
+                divideTheList(Tags.KEY_KHATA, new ArrayList<>(), khataModelList1);
             }
 
             @Override
