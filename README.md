@@ -22,3 +22,17 @@ Future of this app :
 Why we created this ?? 
 
 - Small shop owners dont know about their profits , sales etc. This will help them to know their business worth . 
+
+
+
+
+![6](https://github.com/user-attachments/assets/add7cc9c-9bc3-4d02-989c-6465f6a3a0e4)
+![5](https://github.com/user-attachments/assets/3b5b33e9-1f9b-4f16-bb25-a948e327058f)
+![4](https://github.com/user-attachments/assets/8e894069-87fb-417d-80e2-6f5fb67fbecf)
+![3](https://github.com/user-attachments/assets/241b3993-3402-43cf-bf42-61dd892cef9e)
+![2](https://github.com/user-attachments/assets/7271b50b-7d0b-4b0a-97ee-d6947274dffd)
+![1](https://github.com/user-attachments/assets/003c49b0-c65d-46c4-b4ea-a34ed547a668)
+
+
+
+
