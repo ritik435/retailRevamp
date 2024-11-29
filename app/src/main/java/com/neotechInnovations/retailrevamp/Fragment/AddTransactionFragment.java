@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -502,6 +503,7 @@ public class AddTransactionFragment extends Fragment {
 
     private void addTransaction(String userName, Integer amountTransfer, Integer totalAmountInt, Integer balance, String modeOfPayment, String paymentType) {
         TransactionModel transactionModel = new TransactionModel();
+        transactionModel.setId(UUID.randomUUID());
         transactionModel.setUserName(userName);
         transactionModel.setAmountTransferred(amountTransfer);
         transactionModel.setTotalAmount(totalAmountInt);
@@ -684,7 +686,17 @@ public class AddTransactionFragment extends Fragment {
 
     public void initialiseTransactionRecyclerView() {
 //        Log.d(TAG, "initialiseTransactionRecyclerView: "+specificTransactionModelList.size());
-        transactionAdapter = new TransactionAdapter(specificTransactionModelList, activity,Tags.KEY_SPECIFIC);
+        transactionAdapter = new TransactionAdapter(specificTransactionModelList, activity, Tags.KEY_SPECIFIC, new TransactionAdapter.OnButtonClick() {
+            @Override
+            public void onDeleteTransaction(TransactionModel transactionModel) {
+
+            }
+
+            @Override
+            public void onRestoreTransaction(TransactionModel transactionModel) {
+
+            }
+        });
         rvRecents.setLayoutManager(new LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false));
         rvRecents.setAdapter(transactionAdapter);
     }

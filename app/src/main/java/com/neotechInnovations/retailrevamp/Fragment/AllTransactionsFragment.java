@@ -120,7 +120,17 @@ public class AllTransactionsFragment extends Fragment {
 //        }
 //    }
     public void initialiseTransactionRecyclerView(){
-        transactionAdapter= new TransactionAdapter(transactionModelList,activity, Tags.KEY_SPECIFIC);
+        transactionAdapter= new TransactionAdapter(transactionModelList, activity, Tags.KEY_SPECIFIC, new TransactionAdapter.OnButtonClick() {
+            @Override
+            public void onDeleteTransaction(TransactionModel transactionModel) {
+
+            }
+
+            @Override
+            public void onRestoreTransaction(TransactionModel transactionModel) {
+
+            }
+        });
         rvRecentTransaction.setLayoutManager(new LinearLayoutManager(activity,LinearLayoutManager.VERTICAL,false));
         rvRecentTransaction.setAdapter(transactionAdapter);
     }

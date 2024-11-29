@@ -31,6 +31,7 @@ public class Tags {
     public static String KEY_OFFLINE="offline";
     public static String KEY_CHEQUE="cheque";
     public static String KEY_HOME="home";
+    public static String KEY_HISTORY="history";
     public static String KEY_SPECIFIC="specific";
     public static String KEY_NAME="name";
     public static String KEY_USERID="userId";

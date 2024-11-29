@@ -67,7 +67,7 @@
         <string name="write_name_of_khata">Write the name of khata</string>
         <string name="khata_book">Khata Book</string>
         <string name="go_to_profile"><u>Go to profile</u></string>
-
+        <string name="history"><u>History</u></string>
 
         <string name="sample_name">Ritik Arora</string>
         <string name="sample_email">email@gmail.com</string>

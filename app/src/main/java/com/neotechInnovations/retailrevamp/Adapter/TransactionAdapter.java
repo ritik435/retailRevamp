@@ -29,10 +29,12 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
     public List<TransactionModel> transactionModelList;
     Context mContext;
     String openedFrom;
-    public TransactionAdapter(List<TransactionModel> transactionModelList, Context mContext,String openedFrom) {
+    OnButtonClick onButtonClick;
+    public TransactionAdapter(List<TransactionModel> transactionModelList, Context mContext,String openedFrom,OnButtonClick onButtonClick) {
         this.transactionModelList = transactionModelList;
         this.mContext = mContext;
         this.openedFrom=openedFrom;
+        this.onButtonClick=onButtonClick;
     }
 
     @NonNull
@@ -69,14 +71,42 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
             holder.llDateOfTransaction.setVisibility(View.VISIBLE);
             Log.d(TAG, "onBindViewHolder: isBackedUp: "+ transactionModel.isBackedUp());
         }else {
+            if (transactionModel.isDeleted() && !openedFrom.equals(Tags.KEY_HISTORY)){
+                holder.llMainTransaction.setVisibility(View.GONE);
+                holder.llDateOfTransaction.setVisibility(View.GONE);
+                return;
+            }
             holder.llMainTransaction.setVisibility(View.VISIBLE);
             holder.llDateOfTransaction.setVisibility(View.GONE);
             Log.d(TAG, "onBindViewHolder: isBackedUp: "+ transactionModel.isBackedUp()+" getTransaction :: " +transactionModel.getTransaction()+" : "+transactionModel.getPaymentType() + " key: "+transactionModel.getKey() +" : userId : "+transactionModel.getUserId());
-
-            if (transactionModel.isBackedUp() && openedFrom.equals(Tags.KEY_HOME))
+            if (transactionModel.isBackedUp() && openedFrom.equals(Tags.KEY_HOME)) {
                 holder.ivIsBackedUp.setVisibility(View.VISIBLE);
-            else
+            }
+            else {
                 holder.ivIsBackedUp.setVisibility(View.GONE);
+            }
+            if ( openedFrom.equals(Tags.KEY_HOME)) {
+                Log.d(TAG, "onBindViewHolder: openedFrom : deleted is visible for position : "+position);
+                holder.ivDeleteTransaction.setVisibility(View.VISIBLE);
+                holder.ivDeleteTransaction.setOnClickListener(view -> {
+                    //delete a transaction.
+                    onButtonClick.onDeleteTransaction(transactionModel);
+                });
+            }
+            else {
+                Log.d(TAG, "onBindViewHolder: openedFrom : deleted is gone for position : "+position);
+                holder.ivDeleteTransaction.setVisibility(View.GONE);
+            }
+            if ( openedFrom.equals(Tags.KEY_HISTORY)) {
+                Log.d(TAG, "onBindViewHolder: openedFrom : deleted is visible for position : "+position);
+                holder.ivRestoreTransaction.setVisibility(View.VISIBLE);
+                holder.ivRestoreTransaction.setOnClickListener(view -> {
+                    //delete a transaction.
+                    onButtonClick.onRestoreTransaction(transactionModel);
+                });
+            }else{
+                holder.ivRestoreTransaction.setVisibility(View.GONE);
+            }
 
             if (transactionModel.getKey().equals(Tags.KEY_ADD_PAYMENTS)){
                 holder.ivPaymentType.setImageResource(R.drawable.iv_red_up_arrow);
@@ -147,7 +177,7 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
     public class TransactionViewHolder extends RecyclerView.ViewHolder {
         LinearLayout llDateOfTransaction,llMainTransaction,llBalance;
         TextView txtDate,txtTime,txtUserName,txtPaymentBalance,txtAmountTransferred,txtHeaderDate,txtPrefixBalance,txtSufixBalance;
-        ImageView ivPaymentMode, ivPaymentType,ivPaymentType2,ivIsBackedUp;
+        ImageView ivPaymentMode, ivPaymentType,ivPaymentType2,ivIsBackedUp,ivDeleteTransaction,ivRestoreTransaction;
         public TransactionViewHolder(@NonNull View itemView) {
             super(itemView);
             llDateOfTransaction=itemView.findViewById(R.id.ll_date_of_transaction);
@@ -165,6 +195,12 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
             txtHeaderDate=itemView.findViewById(R.id.txt_header_date);
             llBalance=itemView.findViewById(R.id.ll_balance);
             ivIsBackedUp=itemView.findViewById(R.id.iv_is_backed_up);
+            ivDeleteTransaction=itemView.findViewById(R.id.iv_delete_transaction);
+            ivRestoreTransaction=itemView.findViewById(R.id.iv_restore_transaction);
         }
+    }
+    public interface OnButtonClick{
+        public void onDeleteTransaction(TransactionModel transactionModel);
+        public void onRestoreTransaction(TransactionModel transactionModel);
     }
 }

@@ -221,6 +221,18 @@
                         style="@style/textSubSubscript"/>
                 </LinearLayout>
             </LinearLayout>
+            <ImageView
+                android:id="@+id/iv_delete_transaction"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/iv_delete_red_32"
+                android:layout_gravity="center"/>
+            <ImageView
+                android:id="@+id/iv_restore_transaction"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/iv_restore_green_32"
+                android:layout_gravity="center"/>
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

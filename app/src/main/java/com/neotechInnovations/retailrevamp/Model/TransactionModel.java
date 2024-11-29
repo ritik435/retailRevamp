@@ -18,7 +18,8 @@ import java.util.UUID;
 import okhttp3.ResponseBody;
 
 public class TransactionModel {
-    private static final String TAG ="TransactionModel" ;
+    private static final String TAG = "TransactionModel";
+    UUID transactionId;
     String userId;
     String userName;
     Timestamp date;
@@ -34,6 +35,14 @@ public class TransactionModel {
     boolean deleted;
     boolean edited;
     boolean backedUp;
+
+    public UUID getId() {
+        return transactionId;
+    }
+
+    public void setId(UUID transactionId) {
+        this.transactionId = transactionId;
+    }
 
     public String getUserId() {
         return userId;
@@ -154,22 +163,31 @@ public class TransactionModel {
     public void setMode(String mode) {
         this.mode = mode;
     }
-    public static TransactionModel transactionResponseToTransactionModel(ResponseBody response){
-        TransactionModel transaction=null;
+
+    public static TransactionModel transactionResponseToTransactionModel(ResponseBody response) {
+        TransactionModel transaction = null;
         try {
             // Parse the response body into the User model
             transaction = new Gson().fromJson(response.string(), TransactionModel.class);
-            Log.d(TAG, "transactionResponseToTransactionModel: "+transaction);
+            Log.d(TAG, "transactionResponseToTransactionModel: " + transaction);
 //            RoomAndPollModel roomAndPollModel = new Gson().fromJson(String.valueOf(roomItems.get(i)), RoomAndPollModel.class);
-        }catch (IOException e) {
+        } catch (IOException e) {
             Log.e(TAG, "userResponseToUserModel: ", e);
         }
         return transaction;
     }
 
     public static TransactionModel transactionJSONToTransactionModel(JSONObject transactionItem) throws IOException, JSONException {
-        return new Gson().fromJson(String.valueOf(transactionItem), TransactionModel.class);
+        TransactionModel transactionModel = new TransactionModel();
+        try {
+            transactionModel = new Gson().fromJson(String.valueOf(transactionItem), TransactionModel.class);
+        } catch (Exception e) {
+            Log.d(TAG, "transactionJSONToTransactionModel: Error inn : " + e.getMessage());
+            e.printStackTrace();
+        }
+        return transactionModel;
     }
+
     public static List<TransactionModel> transactionResponseToTransactionModelList(JSONArray transactionArray) throws IOException, JSONException {
         List<TransactionModel> transactionList = new ArrayList<>();
 //        Gson gson = new Gson();
