@@ -453,7 +453,7 @@ public class StatsticsInfoAdapter extends RecyclerView.Adapter<StatsticsInfoAdap
 
                 // Set the minimum date for endDate to be the selected startDate
                 datePicker1.getDatePicker().setMinDate(holder.selectedStartDate.getTimeInMillis());
-
+                datePicker1.getDatePicker().setMaxDate(currentDate1.getTimeInMillis());
                 // Show the dialog to get references to the buttons
                 datePicker1.setOnShowListener(dialog -> {
                     // Access the header and change the background color

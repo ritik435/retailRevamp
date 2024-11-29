@@ -1,7 +1,9 @@
 package com.neotechInnovations.retailrevamp.Activity;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
@@ -9,6 +11,7 @@ import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -26,12 +29,18 @@ import androidx.recyclerview.widget.PagerSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SnapHelper;
 
+import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.navigation.NavigationView;
+import com.neotechInnovations.retailrevamp.API.ResponseListener;
+import com.neotechInnovations.retailrevamp.API.RevampRetrofit;
 import com.neotechInnovations.retailrevamp.Adapter.StatsticsInfoAdapter;
 import com.neotechInnovations.retailrevamp.Adapter.TransactionAdapter;
 import com.neotechInnovations.retailrevamp.Constant.Tags;
 import com.neotechInnovations.retailrevamp.Fragment.AddTransactionFragment;
 import com.neotechInnovations.retailrevamp.Fragment.AllTransactionsFragment;
 import com.neotechInnovations.retailrevamp.Fragment.CreateKhataFragment;
+import com.neotechInnovations.retailrevamp.Fragment.HistoryFragment;
 import com.neotechInnovations.retailrevamp.Fragment.KhataFragment;
 import com.neotechInnovations.retailrevamp.Fragment.LoginFragment;
 import com.neotechInnovations.retailrevamp.Model.KhataModel;
@@ -40,11 +49,14 @@ import com.neotechInnovations.retailrevamp.Model.TransactionModel;
 import com.neotechInnovations.retailrevamp.R;
 import com.neotechInnovations.retailrevamp.Utils.GoogleSheetsManager;
 import com.neotechInnovations.retailrevamp.Utils.LocaleHelper;
+import com.neotechInnovations.retailrevamp.Utils.SessionManagement;
 import com.neotechInnovations.retailrevamp.Utils.SharedPreference;
-import com.google.android.material.appbar.MaterialToolbar;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import com.google.android.material.navigation.NavigationView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -57,6 +69,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import okhttp3.ResponseBody;
+
 public class HomepageActivity extends AppCompatActivity {
 
     private static final String TAG = "HomepageActivity";
@@ -68,32 +82,42 @@ public class HomepageActivity extends AppCompatActivity {
     TextView txtAllTransaction, txtLanguage;
     SwitchCompat materialSwitch;
     RecyclerView rvStatsInfo, rvRecents;
-    FrameLayout flAddTransaction, flAddTransactionBg, flAllTransaction, flLoginFragment, flCreateKhataFragment, flKhataFragment;
+    FrameLayout flAddTransaction, flAddTransactionBg, flAllTransaction, flLoginFragment, flCreateKhataFragment, flKhataFragment, flHistoryFragment;
     DrawerLayout drawerLayout;
     NavigationView nvSidebarMenu;
     LinearLayout llSidebarBg;
     MaterialToolbar topAppBar;
-    private static boolean isAddTransactionFragmentOpened, isAllTransactionFragmentOpened, isCreateKhataFragmentOpened, isLoginFragmentOpened, isKhataFragmentOpened;
+    private static boolean isAddTransactionFragmentOpened, isAllTransactionFragmentOpened, isCreateKhataFragmentOpened, isLoginFragmentOpened, isKhataFragmentOpened, isHistoryFragmentOpened;
     AddTransactionFragment addTransactionFragment;
     AllTransactionsFragment allTransactionsFragment;
     CreateKhataFragment createKhataFragment;
     KhataFragment khataFragment;
     LoginFragment loginFragment;
+    HistoryFragment historyFragment;
     ImageView ivMenu;
     BottomSheetBehavior addTransactionBottomSheetBehavior;
     List<StatsticsInfoModel> statsticsInfoModelList = new ArrayList<>();
     private static boolean isProMode, isEasyMode;
+    public static boolean toRefreshListInHomepage = false;
     HashMap<String, List<Integer>> hmStatsInfo = new HashMap<>();
     public static List<TransactionModel> transactionModelList = new ArrayList<>();
     public static List<TransactionModel> salesTransactionModelList = new ArrayList<>();
     public static List<TransactionModel> collectionTransactionModelList = new ArrayList<>();
     public static List<TransactionModel> paymentTransactionModelList = new ArrayList<>();
     public static List<TransactionModel> khataTransactionModelList = new ArrayList<>();
+    public static List<TransactionModel> specificTransactionModelsList = new ArrayList<>();
     public static List<KhataModel> newKhataList = new ArrayList<>();
-    public static List<String> suggestedKhataList=new ArrayList<>();
+    public static List<String> suggestedKhataList = new ArrayList<>();
+    boolean needForceBackedUp = true;
+    int backupCountTrans = 0, backedUpSuccessTrans = 0;
+    int backupCountKhata = 0, backedUpSuccessKhata = 0;
     StatsticsInfoAdapter statsticsInfoAdapter;
     TransactionAdapter transactionAdapter;
     Integer language;
+    CardView signUpButton, cvHistory;
+    LinearLayout llSidepanelDetails, llSidepanelSignUp;
+    TextView txtSidepanelPhoneNumber, txtSidepanelUserName, txtSidepanelUserEmail, txtUserName, txtSidepanelProfile;
+    public static boolean isDataBackedUp = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,6 +153,21 @@ public class HomepageActivity extends AppCompatActivity {
         flKhataFragment = findViewById(R.id.fl_khata);
         txtLanguage = findViewById(R.id.txt_language);
         materialSwitch = findViewById(R.id.material_switch);
+        txtUserName = findViewById(R.id.txt_user_name);
+        cvHistory = findViewById(R.id.cv_history);
+        flHistoryFragment = findViewById(R.id.fl_history);
+
+        // Access the header layout
+        View headerView = nvSidebarMenu.getHeaderView(0);
+// Find the "Sign Up" button in the header and set a click listener
+        signUpButton = headerView.findViewById(R.id.cv_sign_up);
+        llSidepanelDetails = headerView.findViewById(R.id.ll_sidepanel_details);
+        llSidepanelSignUp = headerView.findViewById(R.id.ll_sidepanel_sign_up);
+        txtSidepanelPhoneNumber = headerView.findViewById(R.id.txt_sidepanel_phone_number);
+        txtSidepanelUserName = headerView.findViewById(R.id.txt_sidepanel_user_name);
+
+        txtSidepanelUserEmail = headerView.findViewById(R.id.txt_sidepanel_user_email);
+        txtSidepanelProfile = headerView.findViewById(R.id.txt_sidepanel_profile);
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -148,16 +187,42 @@ public class HomepageActivity extends AppCompatActivity {
         NavClick();
         changeLanguageManipulateViews(language);
         navigationLayoutAdjustment();
+        loggedIn();
 
         nvSidebarMenu.setVisibility(View.VISIBLE);
         drawerLayout.closeDrawer(GravityCompat.START);
         llSidebarBg.setVisibility(View.GONE);
-
-
+        cvHistory.setOnClickListener(view -> {
+            manipulateHistoryFragment(true);
+        });
+        txtSidepanelProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                nvSidebarMenu.setVisibility(View.GONE);
+                drawerLayout.closeDrawer(GravityCompat.START);
+                llSidebarBg.setVisibility(View.GONE);
+                // Handle the sign-up button click here
+                Toast.makeText(getApplicationContext(), "Sign Up clicked", Toast.LENGTH_SHORT).show();
+                manipulateLoginFragment(true);
+                // Or navigate to the sign-up screen
+            }
+        });
+        signUpButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                nvSidebarMenu.setVisibility(View.GONE);
+                drawerLayout.closeDrawer(GravityCompat.START);
+                llSidebarBg.setVisibility(View.GONE);
+                // Handle the sign-up button click here
+                Toast.makeText(getApplicationContext(), "Sign Up clicked", Toast.LENGTH_SHORT).show();
+                manipulateLoginFragment(true);
+                // Or navigate to the sign-up screen
+            }
+        });
         drawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
             @Override
             public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {
-                Log.d(TAG, "onDrawerSlide: " + slideOffset);
+//                Log.d(TAG, "onDrawerSlide: " + slideOffset);
                 llSidebarBg.setAlpha(slideOffset);
             }
 
@@ -186,12 +251,13 @@ public class HomepageActivity extends AppCompatActivity {
         }
 
         cvAppLock.setOnTouchListener(new View.OnTouchListener() {
-            private boolean inArea=false;
+            private boolean inArea = false;
+
             @SuppressLint("NotifyDataSetChanged")
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                    inArea=true;
+                    inArea = true;
                     cvAppLock.setAlpha(0.3f);
                 } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
                     if (inArea) {
@@ -204,7 +270,7 @@ public class HomepageActivity extends AppCompatActivity {
                         //save data in sheets
                         saveDataInSheets();
                     }
-                }else if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
+                } else if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
                     Log.d(TAG, "onTouch: manipulateAddTransactionFragment MOVEDD ");
                     if (!isInsideButtonArea(view, motionEvent)) {
                         // Set alpha back to 1 when the finger moves outside the button area
@@ -220,10 +286,11 @@ public class HomepageActivity extends AppCompatActivity {
         });
         llLanguageChange.setOnTouchListener(new View.OnTouchListener() {
             private boolean inArea = false;
+
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                    inArea=true;
+                    inArea = true;
                     llLanguageChange.setAlpha(0.3f);
                 } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
                     if (inArea) {
@@ -275,7 +342,7 @@ public class HomepageActivity extends AppCompatActivity {
             public void onStateChanged(@NonNull View view, int newState) {
                 switch (newState) {
                     case BottomSheetBehavior.STATE_HIDDEN: {
-                        manipulateAddTransactionFragment("", false,"");
+                        manipulateAddTransactionFragment("", false, "");
                     }
                     break;
                     case BottomSheetBehavior.STATE_EXPANDED: {
@@ -298,10 +365,11 @@ public class HomepageActivity extends AppCompatActivity {
         });
         txtAllTransaction.setOnTouchListener(new View.OnTouchListener() {
             private boolean inArea = false;
+
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                    inArea=true;
+                    inArea = true;
                     txtAllTransaction.setAlpha(0.5f);
                 } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
                     if (inArea) {
@@ -309,7 +377,7 @@ public class HomepageActivity extends AppCompatActivity {
                         Log.d(TAG, "onTouch: manipulateAllTransactionFragment : to call ");
                         manipulateAllTransactionFragment(true);
                     }
-                }else if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
+                } else if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
                     Log.d(TAG, "onTouch: manipulateAddTransactionFragment MOVEDD ");
                     if (!isInsideButtonArea(view, motionEvent)) {
                         // Set alpha back to 1 when the finger moves outside the button area
@@ -335,7 +403,7 @@ public class HomepageActivity extends AppCompatActivity {
                     if (inArea) {
                         cvAddCollection.setAlpha(1f);
                         Log.d(TAG, "onTouch: manipulateAddTransactionFragment : cvAddCollection to call ");
-                        manipulateAddTransactionFragment(Tags.KEY_ADD_COLLECTION, true,"");
+                        manipulateAddTransactionFragment(Tags.KEY_ADD_COLLECTION, true, "");
                     }
                 } else if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
                     Log.d(TAG, "onTouch: manipulateAddTransactionFragment MOVEDD ");
@@ -359,13 +427,13 @@ public class HomepageActivity extends AppCompatActivity {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                    inArea=true;
+                    inArea = true;
                     cvAddPayments.setAlpha(0.5f);
                 } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
                     if (inArea) {
                         cvAddPayments.setAlpha(1f);
                         Log.d(TAG, "onTouch: manipulateAddTransactionFragment : to call ");
-                        manipulateAddTransactionFragment(Tags.KEY_ADD_PAYMENTS, true,"");
+                        manipulateAddTransactionFragment(Tags.KEY_ADD_PAYMENTS, true, "");
                     }
                 } else if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
                     Log.d(TAG, "onTouch: manipulateAddTransactionFragment MOVEDD ");
@@ -384,17 +452,18 @@ public class HomepageActivity extends AppCompatActivity {
 
         cvAddSales.setOnTouchListener(new View.OnTouchListener() {
             private boolean inArea = false;
+
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                    inArea=true;
+                    inArea = true;
                     cvAddSales.setAlpha(0.5f);
                 } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
                     if (inArea) {
                         cvAddSales.setAlpha(1f);
-                        manipulateAddTransactionFragment(Tags.KEY_ADD_SALES, true,"");
+                        manipulateAddTransactionFragment(Tags.KEY_ADD_SALES, true, "");
                     }
-                }else if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
+                } else if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
                     Log.d(TAG, "onTouch: manipulateAddTransactionFragment MOVEDD ");
                     if (!isInsideButtonArea(view, motionEvent)) {
                         // Set alpha back to 1 when the finger moves outside the button area
@@ -411,15 +480,16 @@ public class HomepageActivity extends AppCompatActivity {
 
         cvAddEntryInKhata.setOnTouchListener(new View.OnTouchListener() {
             private boolean inArea = false;
+
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                    inArea=true;
+                    inArea = true;
                     cvAddEntryInKhata.setAlpha(0.5f);
                 } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
                     if (inArea) {
                         cvAddEntryInKhata.setAlpha(1f);
-                        manipulateAddTransactionFragment(Tags.KEY_ADD_ENTRY_IN_KHATA, true,"");
+                        manipulateAddTransactionFragment(Tags.KEY_ADD_ENTRY_IN_KHATA, true, "");
                     }
                 } else if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
                     Log.d(TAG, "onTouch: manipulateAddTransactionFragment MOVEDD ");
@@ -435,25 +505,27 @@ public class HomepageActivity extends AppCompatActivity {
                 return true;
             }
         });
+//        postAllIsBacked();
+//        syncLists();
     }
 
     private void refineKhataIds() {
-        Log.d(TAG, "refineKhataIds: REFINEKHATA : newKhataList : "+newKhataList.size());
-        for (int i=0;i<newKhataList.size();i++){
-            KhataModel khataModel=newKhataList.get(i);
-            if (khataModel.getKhataUserIdString()==null){
-                String khatauserIdString="";
-                khatauserIdString+="(#";
-                khatauserIdString+=khataModel.getKhataSerialNumber();
-                khatauserIdString+=") ";
-                khatauserIdString+=khataModel.getKhataUserName();
+        Log.d(TAG, "refineKhataIds: REFINEKHATA : newKhataList : " + newKhataList.size());
+        for (int i = 0; i < newKhataList.size(); i++) {
+            KhataModel khataModel = newKhataList.get(i);
+            if (khataModel.getKhataUserIdString() == null) {
+                String khatauserIdString = "";
+                khatauserIdString += "(#";
+                khatauserIdString += khataModel.getKhataSerialNumber();
+                khatauserIdString += ") ";
+                khatauserIdString += khataModel.getKhataUserName();
                 newKhataList.get(i).setKhataUserIdString(khatauserIdString);
                 suggestedKhataList.add(khatauserIdString);
-            }else {
+            } else {
                 suggestedKhataList.add(khataModel.getKhataUserIdString());
             }
         }
-        Log.d(TAG, "refineKhataIds: REFINEKHATA : suggestedKhataList : "+suggestedKhataList.size());
+        Log.d(TAG, "refineKhataIds: REFINEKHATA : suggestedKhataList : " + suggestedKhataList.size());
     }
 
     private void navigationLayoutAdjustment() {
@@ -497,27 +569,38 @@ public class HomepageActivity extends AppCompatActivity {
                 manipulateAllTransactionFragment(true);
             } else if (item.getItemId() == R.id.back_up_on_account) {
                 Log.d(TAG, "NavClick: 2");
-                manipulateLoginFragment(true);
+                if (SessionManagement.userId != null) {
+//                    backupAllData();
+                    forceBackup();
+                } else {
+                    Toast.makeText(getApplicationContext(), "Login or signUp before back up", Toast.LENGTH_SHORT).show();
+                    manipulateLoginFragment(true);
+                }
             } else if (item.getItemId() == R.id.logout) {
                 Log.d(TAG, "NavClick: 3");
+                logout();
                 manipulateLoginFragment(true);
+                loggedIn();
             } else if (item.getItemId() == R.id.create_khata) {
                 Log.d(TAG, "NavClick: 4");
-                manipulateCreateKhataFragment(true,Tags.KEY_CREATE_KHATA);
+                manipulateCreateKhataFragment(true, Tags.KEY_CREATE_KHATA);
             } else if (item.getItemId() == R.id.view_all_khata) {
                 Log.d(TAG, "NavClick: 4a");
-                manipulateCreateKhataFragment(true,Tags.KEY_VIEW_KHATA);
+                manipulateCreateKhataFragment(true, Tags.KEY_VIEW_KHATA);
             } else if (item.getItemId() == R.id.erase_all_data) {
                 Log.d(TAG, "NavClick: 5");
-                SharedPreference.clearLists();
-                SharedPreference.clearNewKhataList();
-                hmStatsInfo.clear();
-                newKhataList.clear();
-                statsticsInfoAdapter.hmStatsInfo = hmStatsInfo;
-                statsticsInfoAdapter.notifyDataSetChanged();
-                retrieveDataFromLocal();
+                eraseAllData();
             } else if (item.getItemId() == R.id.transfer_all_data) {
                 retrieveFromSheet();
+            } else if (item.getItemId() == R.id.restore_all_data) {
+                if (SessionManagement.userId != null) {
+//                    backupAllData();
+                    restoreFromCloud();
+                } else {
+                    Toast.makeText(getApplicationContext(), "Login or signUp before restoring", Toast.LENGTH_SHORT).show();
+                    manipulateLoginFragment(true);
+                }
+//                restoreAllTransactions();
             } else if (item.getItemId() == R.id.upload_on_excel) {
                 calcAllStatsInfo();
 //                    initialiseStatsInfoRecyclerView();
@@ -533,6 +616,41 @@ public class HomepageActivity extends AppCompatActivity {
         });
     }
 
+    private void eraseAllData() {
+        Log.d(TAG, "eraseAllData: entereddd ");
+        SharedPreference.clearLists();
+        SharedPreference.clearNewKhataList();
+        hmStatsInfo.clear();
+        newKhataList.clear();
+        statsticsInfoAdapter.hmStatsInfo = hmStatsInfo;
+        statsticsInfoAdapter.notifyDataSetChanged();
+        retrieveDataFromLocal();
+    }
+
+    private void logout() {
+        if (SessionManagement.userId != null) {
+            SessionManagement sessionManagement = new SessionManagement(this);
+            sessionManagement.clearSession();
+        }
+    }
+
+    public void loggedIn() {
+        SessionManagement sessionManagement = new SessionManagement(this);
+        sessionManagement.getSession();
+        if (SessionManagement.userId != null) {
+            llSidepanelDetails.setVisibility(View.VISIBLE);
+            llSidepanelSignUp.setVisibility(View.GONE);
+            txtSidepanelPhoneNumber.setText(SessionManagement.userId);
+            txtSidepanelUserName.setText(SessionManagement.userName);
+            txtSidepanelUserEmail.setText(SessionManagement.userImage);
+            txtUserName.setText("Hello , " + SessionManagement.userName);
+        } else {
+            llSidepanelDetails.setVisibility(View.GONE);
+            llSidepanelSignUp.setVisibility(View.VISIBLE);
+            txtUserName.setText("Hello , Guest");
+        }
+    }
+
     public void onClick(View view) {
         if (view.getId() == R.id.ll_close_add_transaction) {
             addTransactionBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
@@ -545,19 +663,21 @@ public class HomepageActivity extends AppCompatActivity {
         super.onBackPressed();
         Log.d(TAG, "onBackPressed: is pressed" + isAddTransactionFragmentOpened + " : " + isAllTransactionFragmentOpened + " : " + isCreateKhataFragmentOpened + " : " + isLoginFragmentOpened);
         if (isAddTransactionFragmentOpened) {
-            manipulateAddTransactionFragment("", false,"");
+            manipulateAddTransactionFragment("", false, "");
         } else if (isAllTransactionFragmentOpened) {
             manipulateAllTransactionFragment(false);
         } else if (isKhataFragmentOpened) {
-            manipulateKhataFragment(false,null);
+            manipulateKhataFragment(false, null);
         } else if (isCreateKhataFragmentOpened) {
-            manipulateCreateKhataFragment(false,Tags.KEY_VIEW_KHATA);
+            manipulateCreateKhataFragment(false, Tags.KEY_VIEW_KHATA);
         } else if (isLoginFragmentOpened) {
             manipulateLoginFragment(false);
+        } else if (isHistoryFragmentOpened) {
+            manipulateHistoryFragment(false);
         }
     }
 
-    public void manipulateAddTransactionFragment(String keyAddTransaction, boolean toOpen , String entryKhataName) {
+    public void manipulateAddTransactionFragment(String keyAddTransaction, boolean toOpen, String entryKhataName) {
         Log.d(TAG, "manipulateAddTransactionFragment: entered... : " + toOpen + " : " + keyAddTransaction);
         if (toOpen) {
             flAddTransaction.setVisibility(View.VISIBLE);
@@ -572,7 +692,7 @@ public class HomepageActivity extends AppCompatActivity {
             flAddTransaction.setVisibility(View.GONE);
             flAddTransactionBg.setVisibility(View.GONE);
             isAddTransactionFragmentOpened = false;
-            if (isKhataFragmentOpened){
+            if (isKhataFragmentOpened) {
                 khataFragment.addElementsInRecents();
             }
         }
@@ -591,6 +711,24 @@ public class HomepageActivity extends AppCompatActivity {
         }
     }
 
+    public void manipulateHistoryFragment(boolean toOpen) {
+        if (toOpen) {
+            flHistoryFragment.setVisibility(View.VISIBLE);
+            historyFragment = HistoryFragment.newInstance("", "");
+            getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_right).add(flHistoryFragment.getId(), historyFragment).addToBackStack(null).commit();
+            isHistoryFragmentOpened = true;
+        } else {
+            if (toRefreshListInHomepage) {
+                toRefreshListInHomepage = false;
+                transactionAdapter.transactionModelList = transactionModelList;
+                transactionAdapter.notifyDataSetChanged();
+            }
+            getSupportFragmentManager().beginTransaction().remove(historyFragment).addToBackStack(null).commit();
+            flHistoryFragment.setVisibility(View.GONE);
+            isHistoryFragmentOpened = false;
+        }
+    }
+
     public void manipulateLoginFragment(boolean toOpen) {
         if (toOpen) {
             flLoginFragment.setVisibility(View.VISIBLE);
@@ -604,7 +742,7 @@ public class HomepageActivity extends AppCompatActivity {
         }
     }
 
-    public void manipulateCreateKhataFragment(boolean toOpen , String khataOpening) {
+    public void manipulateCreateKhataFragment(boolean toOpen, String khataOpening) {
         if (toOpen) {
             createKhataFragment = CreateKhataFragment.newInstance(khataOpening, "");
             flCreateKhataFragment.setVisibility(View.VISIBLE);
@@ -619,7 +757,7 @@ public class HomepageActivity extends AppCompatActivity {
         }
     }
 
-    public void manipulateKhataFragment(boolean toOpen,KhataModel khataModel) {
+    public void manipulateKhataFragment(boolean toOpen, KhataModel khataModel) {
         if (toOpen) {
             flKhataFragment.setVisibility(View.VISIBLE);
             khataFragment = KhataFragment.newInstance(khataModel, "");
@@ -674,7 +812,41 @@ public class HomepageActivity extends AppCompatActivity {
 //    }
 
     public void initialiseTransactionRecyclerView() {
-        transactionAdapter = new TransactionAdapter(transactionModelList, this);
+        transactionAdapter = new TransactionAdapter(transactionModelList, this, Tags.KEY_HOME, new TransactionAdapter.OnButtonClick() {
+            @Override
+            public void onDeleteTransaction(TransactionModel transactionModel) {
+                new Thread(() -> {
+                    boolean isTransactionDeleted=false;
+                    for (int i = 0; i < transactionModelList.size(); i++) {
+                        if (transactionModel.getId() != null
+                                && transactionModelList.get(i).getId() != null
+                                && transactionModel.getId().equals(transactionModelList.get(i).getId())) {
+                            isTransactionDeleted=true;
+                            transactionModelList.get(i).setDeleted(true);
+                            break;
+                        }
+                    }
+                    // Notify dataset changes on the main thread
+                    if (isTransactionDeleted)
+                        runOnUiThread(() -> transactionChanged());
+                }).start();
+            }
+//                for (int i=0;i<transactionModelList.size();i++){
+//                    if (transactionModel.getId()!=null && transactionModelList.get(i).getId()!=null && transactionModel.getId().equals(transactionModelList.get(i).getId())){
+//                        transactionModelList.get(i).setDeleted(true);
+//                        break;
+//                    }
+//                }
+//                //delete the date too if doesnot have any transaction in it .
+//                //notify dataset changed
+//                transactionChanged();
+//            }
+
+            @Override
+            public void onRestoreTransaction(TransactionModel transactionModel) {
+
+            }
+        });
         rvRecents.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         rvRecents.setAdapter(transactionAdapter);
         Log.d(TAG, "initialiseTransactionRecyclerView: ....");
@@ -712,6 +884,12 @@ public class HomepageActivity extends AppCompatActivity {
         }
     }
 
+    public void syncLists() {
+        Log.d(TAG, "syncLists: forceBackUp if ");
+        addTransactionInList(transactionModelList, transactionModelList, "");
+
+    }
+
     public void addTransactionInList(List<TransactionModel> transactionList, List<TransactionModel> specifyModelList, String keyAddTransaction) {
         transactionModelList = transactionList;
         if (transactionModelList.size() > 2) {
@@ -727,13 +905,13 @@ public class HomepageActivity extends AppCompatActivity {
         } else if (keyAddTransaction.equals(Tags.KEY_ADD_PAYMENTS)) {
             paymentTransactionModelList = specifyModelList;
         }
-        saveInLocal(transactionList, specifyModelList, keyAddTransaction);
+        saveInLocal(transactionList);
         calcAllStatsInfo();
     }
 
-    private void saveInLocal(List<TransactionModel> transactionList, List<TransactionModel> specifyModelList, String keyAddTransaction) {
+    private void saveInLocal(List<TransactionModel> transactionList) {
         // Save the list to SharedPreferences
-        SharedPreference.saveLists(transactionList, collectionTransactionModelList, paymentTransactionModelList, salesTransactionModelList, khataTransactionModelList);
+        SharedPreference.saveLists(transactionModelList, collectionTransactionModelList, paymentTransactionModelList, salesTransactionModelList, khataTransactionModelList);
     }
 
     private void retrieveDataFromLocal() {
@@ -772,7 +950,7 @@ public class HomepageActivity extends AppCompatActivity {
         if (newKhataList == null) {
             newKhataList = new ArrayList<>();
         }
-        Log.d(TAG, "retrieveDataFromLocal: REFINEKHATA : newKhataList : "+newKhataList.size());
+        Log.d(TAG, "retrieveDataFromLocal: REFINEKHATA : newKhataList : " + newKhataList.size());
 
         initialiseTransactionRecyclerView();
     }
@@ -854,7 +1032,7 @@ public class HomepageActivity extends AppCompatActivity {
             @Override
             public void onSheetCreated(String sheetLink) {
                 Log.d(TAG, "onSheetCreated: sheet is GoogleSheetsManager : created : ---- " + sheetLink);
-                Toast.makeText(getApplicationContext(),sheetLink,Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), sheetLink, Toast.LENGTH_LONG).show();
                 spreadsheetLink = sheetLink;
             }
 
@@ -920,6 +1098,9 @@ public class HomepageActivity extends AppCompatActivity {
         int transactionListSize = transactionModelList.size();
         for (int i = transactionListSize - 1; i >= 0; i--) {
             TransactionModel transactionModel = transactionModelList.get(i);
+            if (transactionModel.isDeleted()) {
+                continue;
+            }
             SimpleDateFormat dateFormat = new SimpleDateFormat(Tags.DATE_FORMAT, Locale.getDefault());
 
             // Convert Timestamp to Date object
@@ -994,53 +1175,473 @@ public class HomepageActivity extends AppCompatActivity {
         Log.d(TAG, "calcAllStatsInfo: hmStatsInfo.get(Current) : " + dateString + " : " + hmStatsInfo.get(dateString));
 
     }
-//    private void getDataFromAPI() {
-//
-//        // creating a string variable for URL.
-//        String url = "https://spreadsheets.google.com/feeds/list/1AOOaz-5PhVgIvfROammZsdUs92PdYhEUgGoDrYlGGhc/od6/public/values?alt=json";
-//        // creating a new variable for our request queue
-//        RequestQueue queue = Volley.newRequestQueue(MainActivity.this);
-//
-//        // creating a variable for our JSON object request and passing our URL to it.
-//        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
-//            @Override
-//            public void onResponse(JSONObject response) {
-//                loadingPB.setVisibility(View.GONE);
-//                try {
-//                    JSONObject feedObj = response.getJSONObject("feed");
-//                    JSONArray entryArray = feedObj.getJSONArray("entry");
-//                    for(int i=0; i<entryArray.length(); i++){
-//                        JSONObject entryObj = entryArray.getJSONObject(i);
-//                        String firstName = entryObj.getJSONObject("gsx$firstname").getString("$t");
-//                        String lastName = entryObj.getJSONObject("gsx$lastname").getString("$t");
-//                        String email = entryObj.getJSONObject("gsx$email").getString("$t");
-//                        String avatar = entryObj.getJSONObject("gsx$avatar").getString("$t");
-//                        userModalArrayList.add(new UserModal(firstName, lastName, email, avatar));
-//
-//                        // passing array list to our adapter class.
-//                        userRVAdapter = new UserRVAdapter(userModalArrayList, MainActivity.this);
-//
-//                        // setting layout manager to our recycler view.
-//                        userRV.setLayoutManager(new LinearLayoutManager(MainActivity.this));
-//
-//                        // setting adapter to our recycler view.
-//                        userRV.setAdapter(userRVAdapter);
-//                    }
-//
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
+
+    public void forceBackup() {
+        if (transactionModelList.isEmpty()) {
+            Toast.makeText(this, "Nothing is there to backup", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        //delete all transactions from db
+        deleteAllTransactions();
+        //delete all khata from db
+        deleteAllKhatas();
+        //put all transactions as isbackedUp=false
+        postAllIsBacked();
+        //syncLists
+        syncLists();
+        //sync new Khata list
+        SharedPreference.savenNewKhataLists(newKhataList);
+        //backup again
+        backupAllData();
+    }
+
+    public void backupAllData() {
+        if (transactionModelList.isEmpty()) {
+            Toast.makeText(this, "Nothing is there to backup", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Log.d(TAG, "backupAllTransactions: forceBackUp entered if");
+        needForceBackedUp = true;
+        backupCountTrans = 0;
+        backedUpSuccessTrans = 0;
+        backupCountKhata = 0;
+        backedUpSuccessKhata = 0;
+        Log.d(TAG, "backupAllTransactions: transactionModelList.size()" + transactionModelList.size());
+        Log.d(TAG, "backupAllTransactions: salesTransactionModelList.size()" + salesTransactionModelList.size());
+        Log.d(TAG, "backupAllTransactions: khataTransactionModelList.size()" + khataTransactionModelList.size());
+        Log.d(TAG, "backupAllTransactions: collectionTransactionModelList.size()" + collectionTransactionModelList.size());
+        Log.d(TAG, "backupAllTransactions: paymentTransactionModelList.size()" + paymentTransactionModelList.size());
+        for (int i = transactionModelList.size() - 1; i >= 0; i--) {
+            if (!transactionModelList.get(i).isBackedUp() && transactionModelList.get(i).getTransaction()) {
+                backupCountTrans++;
+                needForceBackedUp = false;
+                Log.d(TAG, "backupAllTransactions: which is not backed : " + transactionModelList.get(i).getUserName());
+                backupTransactionOnCloud(transactionModelList.get(i), i);
+                break;
+            }
+        }
+        for (int i = newKhataList.size() - 1; i >= 0; i--) {
+            KhataModel khataModel = newKhataList.get(i);
+            khataModel.setUserId(SessionManagement.userId);
+            if (!khataModel.isBackedUp()) {
+                backupCountKhata++;
+                needForceBackedUp = false;
+                Log.d(TAG, "backupAllTransactions::: which is not backed : " + khataModel.getKhataSerialNumber());
+                backupKhataOnCloud(khataModel, i);
+                break;
+            }
+        }
+        //show a dialog box for force backup.
+        if (needForceBackedUp) {
+            showBackupConfirmationDialog();
+        }
+    }
+
+    private void backupTransactionOnCloud(TransactionModel transactionModel, int pos) {
+        final Integer[] position = {pos};
+        if (!transactionModel.getTransaction()) {
+            position[0]--;
+            if (position[0] < 0) {
+                Toast.makeText(getApplicationContext(), "Backed up transaction successfully: " + backedUpSuccessTrans, Toast.LENGTH_SHORT).show();
+                syncLists();
+                return;
+            }
+            backupTransactionOnCloud(transactionModelList.get(position[0]), position[0]);
+            return;
+        }
+        RevampRetrofit revampRetrofit = new RevampRetrofit();
+        String url = Tags.URL_ADD_TRANSACTION; // Replace with your endpoint
+        HashMap<String, Object> data = new HashMap<>();  // Replace with your actual data object
+        data.put(Tags.KEY_USERNAME, transactionModel.getUserName());
+        data.put(Tags.KEY_NAME, transactionModel.getUserName());
+//        data.put(Tags.KEY_PASSWORD, password);
+        Log.d(TAG, " getTransaction backupTransactionOnCloud BACKUPLOGICTEST :: " + pos + "  : " + transactionModel.getUserName() + " : " + transactionModel.getDate());
+        revampRetrofit.postDataTransaction(url, transactionModel, new ResponseListener() {
+            @Override
+            public void onSuccess(ResponseBody responseBody) throws IOException, JSONException {
+                String responseString = responseBody.string();
+                JSONObject jsonObject = new JSONObject(responseString);
+                Log.d(TAG, "onSuccess : Response: Transaction is done : " + jsonObject.toString());
+                TransactionModel transactionModel1 = TransactionModel.transactionJSONToTransactionModel(jsonObject);
+                Log.d(TAG, "onSuccess: backupTransactionOnCloud transaction is : " + transactionModel1.getTransaction());
+                backedUpSuccessTrans++;
+                Log.d(TAG, "onSuccess: transaction is : pos" + backedUpSuccessTrans + " :: " + backupCountTrans);
+                transactionModelList.get(pos).setBackedUp(true);
+                position[0]--;
+                Log.d(TAG, "onSuccess: BACKUPDONE transactionModelList.size() : " + transactionModelList.size() + " : position[0] : " + position[0]);
+                if (position[0] < 0) {
+                    Toast.makeText(getApplicationContext(), "Backed up transaction successfully : " + backedUpSuccessTrans, Toast.LENGTH_SHORT).show();
+                    syncLists();
+                } else {
+                    backupTransactionOnCloud(transactionModelList.get(position[0]), position[0]);
+                }
+//                if (backedUpSuccessTrans == backupCountTrans) {
+//                    Toast.makeText(getApplicationContext(), "Backed up successfully", Toast.LENGTH_SHORT).show();
+//                    syncLists();
 //                }
-//
+//                if ()
+//                pos++;
+//                    backupTransactionOnCloud(transactionModelList.get(pos), pos++);
+            }
+
+            @Override
+            public void onFailure(ResponseBody responseBody) throws IOException, JSONException {
+                Log.e(TAG, "onFailure Failed: " + responseBody);
+                Toast.makeText(getApplicationContext(), "Failed to add transaction", Toast.LENGTH_SHORT).show();
+//                String responseString = responseBody.string();
+//                JSONObject jsonObject = new JSONObject(responseString);
+            }
+
+            @Override
+            public void onRequestFailed(String message) {
+                Log.e(TAG, "onRequestFailed : Request Failure: " + message);
+                Toast.makeText(getApplicationContext(), "Failed to add transaction on request", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public void backupKhataOnCloud(KhataModel khataModel, int pos) {
+        final Integer[] position = {pos};
+        RevampRetrofit revampRetrofit = new RevampRetrofit();
+
+        String url = Tags.URL_ADD_KHATA; // Replace with your endpoint
+        Log.d(TAG, "backupKhataOnCloud: BACKUPLOGICTEST :: " + khataModel.getKhataBalance() + " : " + khataModel.getKhataSerialNumber() + " : " + khataModel.getKhataUserIdString() + " : " + khataModel.getKhataUserName() + " : " + khataModel.getKhataUserPhone() + " : " + SessionManagement.userId);
+        revampRetrofit.postDataKhata(url, khataModel, new ResponseListener() {
+            @Override
+            public void onSuccess(ResponseBody responseBody) throws IOException, JSONException {
+                String responseString = responseBody.string();
+                JSONObject jsonObject = new JSONObject(responseString);
+                Log.d(TAG, "onSuccess : Response: Transaction is done : " + jsonObject.toString());
+                KhataModel khataModel1 = KhataModel.khataJSONToKhataModel(jsonObject);
+                Log.d(TAG, "onSuccess: transaction is : " + khataModel1.getKhataSerialNumber());
+                backedUpSuccessKhata++;
+                Log.d(TAG, "onSuccess: transaction is : pos" + backedUpSuccessKhata + " :: " + backupCountKhata);
+                newKhataList.get(pos).setBackedUp(true);
+                position[0]--;
+                Log.d(TAG, "onSuccess: BACKUPDONE KHATA newKhataList.size() : " + newKhataList.size() + " : position[0] : " + position[0]);
+                if (position[0] < 0) {
+                    Toast.makeText(getApplicationContext(), "Backed up khata successfully : " + backedUpSuccessKhata, Toast.LENGTH_SHORT).show();
+                    SharedPreference.savenNewKhataLists(newKhataList);
+                } else {
+                    backupKhataOnCloud(newKhataList.get(position[0]), position[0]);
+                }
+            }
+
+            @Override
+            public void onFailure(ResponseBody responseBody) throws IOException, JSONException {
+                Log.e(TAG, "onFailure Failed: " + responseBody);
+                Toast.makeText(getApplicationContext(), "Failed to back up khata", Toast.LENGTH_SHORT).show();
+//                String responseString = responseBody.string();
+//                JSONObject jsonObject = new JSONObject(responseString);
+            }
+
+            @Override
+            public void onRequestFailed(String message) {
+                Log.e(TAG, "onRequestFailed : Request Failure: " + message);
+                Toast.makeText(getApplicationContext(), "Failed to back up khata on request", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public void restoreFromCloud() {
+        eraseAllData();
+        restoreAllTransactions();
+        restoreAllKhatas();
+        if (newKhataList.size() > 0 || transactionModelList.size() > 0) {
+            isDataBackedUp = true;
+        }
+    }
+
+    private void divideTheList(String key, List<TransactionModel> transactionModelList, List<KhataModel> khataModelList) {
+        if (key.equals(Tags.KEY_TRANSACTIONS)) {
+//            this.transactionModelList = transactionModelList;
+            sortListOut(transactionModelList);
+            saveInLocal(transactionModelList);
+        } else if (key.equals(Tags.KEY_KHATA)) {
+            SharedPreference.savenNewKhataLists(khataModelList);
+        }
+        calcAllStatsInfo();
+    }
+
+    private void sortListOut(List<TransactionModel> transactionList) {
+        Log.d(TAG, "sortListOut: Entered checkAnotherTransaction " + transactionList.size());
+        transactionModelList = new ArrayList<>();
+        paymentTransactionModelList = new ArrayList<>();
+        collectionTransactionModelList = new ArrayList<>();
+        salesTransactionModelList = new ArrayList<>();
+        khataTransactionModelList = new ArrayList<>();
+        for (int i = transactionList.size() - 1; i >= 0; i--) {
+            TransactionModel transactionModel = transactionList.get(i);
+            Log.d(TAG, "sortListOut: sortListOut : GETDATEINSORT() : " + transactionModel.getDate().toString());
+            specificTransactionModelsList = null;
+            if (transactionModel.getTransaction()) {
+                Log.d(TAG, "sortListOut: checkAnotherTransaction: addedIn :: getKey :: " + transactionModel.getKey());
+                if (transactionModel.getKey().equals(Tags.KEY_ADD_PAYMENTS)) {
+                    specificTransactionModelsList = paymentTransactionModelList;
+                } else if (transactionModel.getKey().equals(Tags.KEY_ADD_COLLECTION)) {
+                    specificTransactionModelsList = collectionTransactionModelList;
+                } else if (transactionModel.getKey().equals(Tags.KEY_ADD_SALES)) {
+                    specificTransactionModelsList = salesTransactionModelList;
+                } else if (transactionModel.getKey().equals(Tags.KEY_ADD_ENTRY_IN_KHATA)) {
+                    specificTransactionModelsList = khataTransactionModelList;
+                }
+                boolean is0thElementAdded = checkAnotherTransaction(transactionModel);
+                if (specificTransactionModelsList != null) {
+                    specificTransactionModelsList.add(1, transactionModel);
+                }
+            }
+        }
+        for (int i = transactionList.size() - 1; i >= 0; i--) {
+            TransactionModel transactionModel = transactionList.get(i);
+            Log.d(TAG, "sortListOut: sortListOut : GETDATEINSORT() : " + transactionModel.getDate().toString());
+            specificTransactionModelsList = null;
+            if (transactionModel.getTransaction()) {
+                Log.d(TAG, "sortListOut: checkAnotherTransaction: addedIn :: getKey :: " + transactionModel.getKey());
+                specificTransactionModelsList = transactionModelList;
+                boolean is0thElementAdded = checkAnotherTransaction(transactionModel);
+                if (specificTransactionModelsList != null) {
+                    specificTransactionModelsList.add(1, transactionModel);
+                }
+            }
+        }
+    }
+
+    private void restoreAllTransactions() {
+        Log.d(TAG, "deleteAllTransactions: restoreFromCloud restoreAllKhatas entered forceRestore");
+        RevampRetrofit revampRetrofit = new RevampRetrofit();
+        String url = Tags.URL_GET_TRANSACTIONS; // Replace with your endpoint
+        HashMap<String, Object> data = new HashMap<>();  // Replace with your actual data object
+        data.put(Tags.KEY_USERID, SessionManagement.userId);
+        revampRetrofit.getData(url, data, new ResponseListener() {
+            @Override
+            public void onSuccess(ResponseBody responseBody) throws IOException, JSONException {
+                String responseString = responseBody.string();
+                JSONArray transactionArray = new JSONArray(responseString);
+                Log.d(TAG, "onSuccess : Response: Transaction is done : " + transactionArray.toString());
+                List<TransactionModel> transactionModelList1 = TransactionModel.transactionResponseToTransactionModelList(transactionArray);
+                Log.d(TAG, "onSuccess: restoreFromCloud transactionModelList1.size() " + transactionModelList1.size());
+                if (transactionModelList1.size() > 0) {
+                    Log.d(TAG, "onSuccess: GETDATEINSORT :: " + transactionModelList1.get(0).getDate());
+                }
+                Collections.reverse(transactionModelList1);
+//                transactionModelList = transactionModelList1;
+                divideTheList(Tags.KEY_TRANSACTIONS, transactionModelList1, new ArrayList<>());
+                alreadyBackedUp(transactionModelList);
+                initialiseTransactionRecyclerView();
+            }
+
+            @Override
+            public void onFailure(ResponseBody responseBody) throws IOException, JSONException {
+                Log.e(TAG, "onFailure restoreFromCloud Failed: " + responseBody);
+                Toast.makeText(getApplicationContext(), "Unable to restore transactions", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onRequestFailed(String message) {
+                Log.e(TAG, "onRequestFailed : restoreFromCloud Request Failure: " + message);
+                Toast.makeText(getApplicationContext(), "Unable to restore transactions on request", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void alreadyBackedUp(List<TransactionModel> transactionModelList) {
+        for (int i = 0; i < transactionModelList.size(); i++) {
+            TransactionModel transactionModel = transactionModelList.get(i);
+            transactionModel.setBackedUp(true);
+        }
+    }
+
+    private void restoreAllKhatas() {
+        Log.d(TAG, "deleteAllTransactions: restoreFromCloud restoreAllKhatas entered forceRestore");
+        RevampRetrofit revampRetrofit = new RevampRetrofit();
+        String url = Tags.URL_GET_ALL_KHATA; // Replace with your endpoint
+        HashMap<String, Object> data = new HashMap<>();  // Replace with your actual data object
+        data.put(Tags.KEY_USERID, SessionManagement.userId);
+        revampRetrofit.getData(url, data, new ResponseListener() {
+            @Override
+            public void onSuccess(ResponseBody responseBody) throws IOException, JSONException {
+                String responseString = responseBody.string();
+                JSONArray khataArray = new JSONArray(responseString);
+                Log.d(TAG, "onSuccess : Response: Transaction is done : " + khataArray.toString());
+                List<KhataModel> khataModelList1 = KhataModel.khataResponseToKhataModelList(khataArray);
+                Log.d(TAG, "onSuccess: restoreFromCloud khataModelList1.size() " + khataModelList1.size());
+                Collections.reverse(khataModelList1);
+                newKhataList = khataModelList1;
+                divideTheList(Tags.KEY_KHATA, new ArrayList<>(), khataModelList1);
+            }
+
+            @Override
+            public void onFailure(ResponseBody responseBody) throws IOException, JSONException {
+                Log.e(TAG, "onFailure Failed: restoreFromCloud : : " + responseBody);
+                Toast.makeText(getApplicationContext(), "Unable to restore Khatas", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onRequestFailed(String message) {
+                Log.e(TAG, "onRequestFailed : Request Failure: restoreFromCloud :: " + message);
+                Toast.makeText(getApplicationContext(), "Unable to restore Khatas on request", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void deleteAllKhatas() {
+        Log.d(TAG, "deleteAllTransactions: entered forceBackUp");
+        RevampRetrofit revampRetrofit = new RevampRetrofit();
+        String url = Tags.URL_DELETE_KHATAS; // Replace with your endpoint
+        HashMap<String, Object> data = new HashMap<>();  // Replace with your actual data object
+        data.put(Tags.KEY_USERID, SessionManagement.userId);
+        revampRetrofit.deleteData(url, data, new ResponseListener() {
+            @Override
+            public void onSuccess(ResponseBody responseBody) throws IOException, JSONException {
+                String responseString = responseBody.string();
+                JSONObject jsonObject = new JSONObject(responseString);
+                Log.d(TAG, "onSuccess : Response: Transaction is done : " + jsonObject.toString());
+            }
+
+            @Override
+            public void onFailure(ResponseBody responseBody) throws IOException, JSONException {
+                Log.e(TAG, "onFailure Failed: " + responseBody);
+                Toast.makeText(getApplicationContext(), "Unable to delete transactions", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onRequestFailed(String message) {
+                Log.e(TAG, "onRequestFailed : Request Failure: " + message);
+                Toast.makeText(getApplicationContext(), "Unable to delete transactions on request", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void deleteAllTransactions() {
+        Log.d(TAG, "deleteAllTransactions: entered forceBackUp");
+        RevampRetrofit revampRetrofit = new RevampRetrofit();
+        String url = Tags.URL_DELETE_TRANSACTIONS; // Replace with your endpoint
+        HashMap<String, Object> data = new HashMap<>();  // Replace with your actual data object
+        data.put(Tags.KEY_USERID, SessionManagement.userId);
+        revampRetrofit.deleteData(url, data, new ResponseListener() {
+            @Override
+            public void onSuccess(ResponseBody responseBody) throws IOException, JSONException {
+                String responseString = responseBody.string();
+                JSONObject jsonObject = new JSONObject(responseString);
+                Log.d(TAG, "onSuccess : Response: Transaction is done : " + jsonObject.toString());
+            }
+
+            @Override
+            public void onFailure(ResponseBody responseBody) throws IOException, JSONException {
+                Log.e(TAG, "onFailure Failed: " + responseBody);
+                Toast.makeText(getApplicationContext(), "Unable to delete transactions", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onRequestFailed(String message) {
+                Log.e(TAG, "onRequestFailed : Request Failure: " + message);
+                Toast.makeText(getApplicationContext(), "Unable to delete transactions on request", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void postAllIsBacked() {
+        Log.d(TAG, "postAllIsBacked: forceBackUp entered");
+        for (int i = 0; i < transactionModelList.size(); i++) {
+//            if (transactionModelList.get(i).getUserId()==null){
+            transactionModelList.get(i).setUserId(SessionManagement.userId);
 //            }
-//        }, new Response.ErrorListener() {
-//            @Override
-//            public void onErrorResponse(VolleyError error) {
-//                // handling on error listener method.
-//                Toast.makeText(HomepageActivity.this, "Fail to get data..", Toast.LENGTH_SHORT).show();
+            transactionModelList.get(i).setBackedUp(false);
+        }
+        for (int i = 0; i < newKhataList.size(); i++) {
+//            if (transactionModelList.get(i).getUserId()==null){
+            newKhataList.get(i).setUserId(SessionManagement.userId);
 //            }
-//        });
-//        // calling a request queue method
-//        // and passing our json object
-//        queue.add(jsonObjectRequest);
-//    }
+            newKhataList.get(i).setBackedUp(false);
+        }
+    }
+
+    // Method to show confirmation dialog
+    public void showBackupConfirmationDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Confirmation");
+        builder.setMessage("Are you sure you want to do a force back up?");
+
+        // "Yes" button
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Handle the "Yes" action
+                forceBackup();
+            }
+        });
+
+        // "No, cancel" button
+        builder.setNegativeButton("No, cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Dismiss the dialog
+                dialog.dismiss();
+            }
+        });
+
+        // Show the dialog
+        AlertDialog dialog = builder.create();
+        dialog.show();
+        Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+        positiveButton.setTextColor(this.getColor(R.color.increasing_green)); // Red color for "Yes"
+
+        Button negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+        negativeButton.setTextColor(this.getColor(R.color.decreasing_red)); // Blue color for "No, cancel"
+
+    }
+
+    public boolean checkAnotherTransaction(TransactionModel specificTransaction) {
+        Log.d(TAG, "checkAnotherTransaction: enterred... ");
+        SimpleDateFormat dateFormat = new SimpleDateFormat(Tags.DATE_FORMAT, Locale.getDefault());
+        // Convert Timestamp to Date object
+        Date currentDate = new Date(specificTransaction.getDate().getTime());
+        Date latestEntryDate = null;
+        Date latestEntrySpecificDate = null;
+        String latestEntryDateString = "";
+        String latestEntrySpecificDateString = "";
+        Log.d(TAG, "checkAnotherTransaction 1: ");
+        try {
+            Log.d(TAG, "checkAnotherTransaction 1 a): " + specificTransactionModelsList.get(0).getDate().toString());
+            TransactionModel specificTransactionModel = specificTransactionModelsList.get(0);
+            latestEntrySpecificDate = new Date(specificTransactionModel.getDate().getTime());
+            latestEntrySpecificDateString = dateFormat.format(latestEntrySpecificDate);
+        } catch (Exception e) {
+            Log.d(TAG, "checkAnotherTransaction: " + e.getMessage());
+        }
+        Log.d(TAG, "checkAnotherTransaction 2: ");
+        // Format the Date object into a string
+        String currentdateString = dateFormat.format(currentDate);
+        String currentdateSpecificString = dateFormat.format(currentDate);
+
+        TransactionModel transactionModel = new TransactionModel();
+        transactionModel.setDate(specificTransaction.getDate());
+        transactionModel.setTransaction(false);
+        transactionModel.setBackedUp(false);
+        transactionModel.setUserId(SessionManagement.userId);
+        Log.d(TAG, "checkAnotherTransaction COMPARINGDATES 3 a) : currentDateString" + currentdateString + " latestEntrySpecificDateString : " + latestEntrySpecificDateString);
+
+        if ((specificTransactionModelsList != null && !specificTransactionModelsList.isEmpty()) && currentdateString.equals(latestEntrySpecificDateString)) { //&& !specificTransactionModelsList.get(0).getTransaction()
+            //then do nothing
+            Log.d(TAG, "checkAnotherTransaction: FALSEEEE addedIn which list : " + specificTransaction.getUserName());
+            return false;
+        } else {
+            Log.d(TAG, "checkAnotherTransaction: TRUEEE addedIn which list : " + specificTransaction.getUserName());
+            //if not then make new entry of date sequence at 0th element.
+            if (specificTransactionModelsList == null) {
+                specificTransactionModelsList = new ArrayList<>();
+            }
+            specificTransactionModelsList.add(0, transactionModel);
+            Log.d(TAG, "checkAnotherTransaction: is added in transaction and specific Transaction ... specificTransactionModelList: " + specificTransactionModelsList.size());
+            return true;
+        }
+//        Log.d(TAG, "checkAnotherTransaction 3 b ) : currentDateString" + currentdateString + " latestEntryDateString : " + latestEntryDateString);
+    }
+
+    public void transactionChanged() {
+        initialiseTransactionRecyclerView();
+        calcAllStatsInfo();
+        initialiseStatsInfoRecyclerView();
+        syncLists();
+    }
 }

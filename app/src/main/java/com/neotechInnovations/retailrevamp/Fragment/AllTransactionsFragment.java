@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.neotechInnovations.retailrevamp.Activity.HomepageActivity;
 import com.neotechInnovations.retailrevamp.Adapter.TransactionAdapter;
+import com.neotechInnovations.retailrevamp.Constant.Tags;
 import com.neotechInnovations.retailrevamp.Model.TransactionModel;
 import com.neotechInnovations.retailrevamp.R;
 
@@ -119,7 +120,17 @@ public class AllTransactionsFragment extends Fragment {
 //        }
 //    }
     public void initialiseTransactionRecyclerView(){
-        transactionAdapter= new TransactionAdapter(transactionModelList,activity);
+        transactionAdapter= new TransactionAdapter(transactionModelList, activity, Tags.KEY_SPECIFIC, new TransactionAdapter.OnButtonClick() {
+            @Override
+            public void onDeleteTransaction(TransactionModel transactionModel) {
+
+            }
+
+            @Override
+            public void onRestoreTransaction(TransactionModel transactionModel) {
+
+            }
+        });
         rvRecentTransaction.setLayoutManager(new LinearLayoutManager(activity,LinearLayoutManager.VERTICAL,false));
         rvRecentTransaction.setAdapter(transactionAdapter);
     }

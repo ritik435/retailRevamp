@@ -21,47 +21,91 @@
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:layout_gravity="center"
-                android:layout_marginHorizontal="30dp"
-                app:cardCornerRadius="30dp" />
+                android:layout_marginHorizontal="20dp"
+                android:backgroundTint="@color/grey"
+                android:alpha=".7"
+                app:cardCornerRadius="30dp" >
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="10dp"
+                    android:src="@drawable/iv_blank_user"/>
+            </androidx.cardview.widget.CardView>
 
             <LinearLayout
+                android:id="@+id/ll_sidepanel_details"
                 android:layout_width="match_parent"
                 android:layout_height="100dp"
                 android:background="@color/decreasing_red"
-                android:gravity="center"
+                android:gravity="center_vertical"
+                android:visibility="visible"
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/txt_sidepanel_user_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
                     android:layout_marginLeft="5dp"
                     android:text="@string/sample_name"
-                    android:textColor="?colorSecondary"
-                    android:textSize="14dp"
-                    android:textStyle="bold" />
+                    android:textColor="?colorPrimary"
+                    style="@style/textLight"/>
 
                 <TextView
+                    android:id="@+id/txt_sidepanel_user_email"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
+                    android:layout_gravity="start"
                     android:layout_marginLeft="5dp"
                     android:text="@string/sample_email"
-                    android:textColor="?colorSecondary"
-                    android:textSize="14dp"
-                    android:textStyle="bold" />
+                    android:visibility="gone"
+                    android:textColor="?colorPrimary"
+                    style="@style/textLight"/>
 
                 <TextView
+                    android:id="@+id/txt_sidepanel_phone_number"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start"
+                    android:layout_marginLeft="5dp"
+                    android:text="@string/sample_phone"
+                    android:textColor="?colorPrimary"
+                    android:layout_marginBottom="5dp"
+                    style="@style/textLight"/>
+                <TextView
+                    android:id="@+id/txt_sidepanel_profile"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start"
+                    android:layout_marginLeft="5dp"
+                    android:text="@string/go_to_profile"
+                    android:textColor="@color/blue"
+                    style="@style/textLight"/>
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/ll_sidepanel_sign_up"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center">
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cv_sign_up"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:layout_marginLeft="5dp"
-                    android:text="@string/sample_phone"
-                    android:textColor="?colorSecondary"
-                    android:textSize="14dp"
-                    android:textStyle="bold" />
+                    android:backgroundTint="?colorPrimary"
+                    app:cardCornerRadius="5dp">
+                    <TextView
+                        style="@style/textLight"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:text="@string/sign_up"
+                        android:paddingHorizontal="10dp"
+                        android:letterSpacing=".2"
+                        android:paddingVertical="5dp"
+                        android:textColor="?colorSecondary" />
+                </androidx.cardview.widget.CardView>
             </LinearLayout>
-
         </LinearLayout>
 
     </LinearLayout>

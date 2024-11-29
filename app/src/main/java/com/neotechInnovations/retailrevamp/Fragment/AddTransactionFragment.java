@@ -36,6 +36,7 @@ import com.neotechInnovations.retailrevamp.Constant.Tags;
 import com.neotechInnovations.retailrevamp.Model.KhataModel;
 import com.neotechInnovations.retailrevamp.Model.TransactionModel;
 import com.neotechInnovations.retailrevamp.R;
+import com.neotechInnovations.retailrevamp.Utils.SessionManagement;
 import com.neotechInnovations.retailrevamp.Utils.SharedPreference;
 
 import java.sql.Timestamp;
@@ -44,6 +45,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -501,6 +503,7 @@ public class AddTransactionFragment extends Fragment {
 
     private void addTransaction(String userName, Integer amountTransfer, Integer totalAmountInt, Integer balance, String modeOfPayment, String paymentType) {
         TransactionModel transactionModel = new TransactionModel();
+        transactionModel.setId(UUID.randomUUID());
         transactionModel.setUserName(userName);
         transactionModel.setAmountTransferred(amountTransfer);
         transactionModel.setTotalAmount(totalAmountInt);
@@ -509,6 +512,8 @@ public class AddTransactionFragment extends Fragment {
         transactionModel.setTransaction(true);
         transactionModel.setKey(keyAddTransaction);
         transactionModel.setPaymentType(paymentType);
+        transactionModel.setBackedUp(false);
+        transactionModel.setUserId(SessionManagement.userId);
         if (keyAddTransaction.equals(Tags.KEY_ADD_ENTRY_IN_KHATA)) {
             Log.d(TAG, "addTransaction: AddEntryInKhata: " + userName);
             transactionModel.setKhataNumber(userName);
@@ -545,6 +550,7 @@ public class AddTransactionFragment extends Fragment {
         } else
             initialiseTransactionRecyclerView();
         syncLists();
+//        ((HomepageActivity)activity).backupOnCloud(transactionModel);
         hideKeyboard(activity);
         resetAddTransadtion();
     }
@@ -622,6 +628,8 @@ public class AddTransactionFragment extends Fragment {
         TransactionModel transactionModel = new TransactionModel();
         transactionModel.setDate(specificTransaction.getDate());
         transactionModel.setTransaction(false);
+        transactionModel.setBackedUp(false);
+        transactionModel.setUserId(SessionManagement.userId);
         Log.d(TAG, "checkAnotherTransaction 3 a) : currentDateString" + currentdateString + " latestEntrySpecificDateString : " + latestEntrySpecificDateString);
 
         if ((specificTransactionModelList != null && specificTransactionModelList.size() > 0) && currentdateString.equals(latestEntrySpecificDateString)) {
@@ -678,7 +686,17 @@ public class AddTransactionFragment extends Fragment {
 
     public void initialiseTransactionRecyclerView() {
 //        Log.d(TAG, "initialiseTransactionRecyclerView: "+specificTransactionModelList.size());
-        transactionAdapter = new TransactionAdapter(specificTransactionModelList, activity);
+        transactionAdapter = new TransactionAdapter(specificTransactionModelList, activity, Tags.KEY_SPECIFIC, new TransactionAdapter.OnButtonClick() {
+            @Override
+            public void onDeleteTransaction(TransactionModel transactionModel) {
+
+            }
+
+            @Override
+            public void onRestoreTransaction(TransactionModel transactionModel) {
+
+            }
+        });
         rvRecents.setLayoutManager(new LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false));
         rvRecents.setAdapter(transactionAdapter);
     }

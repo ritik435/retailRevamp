@@ -64,7 +64,7 @@ public class KhataAdapter extends RecyclerView.Adapter<KhataAdapter.KhataViewHol
                     }, 200);
                 } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
                     holder.cvViewDetails.setAlpha(1f);
-                    Log.d(TAG, "onTouch: manipulateAllTransactionFragment : to call KhataFragment: "+khataModel.getKhataUserId()+" : "+khataModel.getKhataUserName());
+                    Log.d(TAG, "onTouch: manipulateAllTransactionFragment : to call KhataFragment: "+" : "+khataModel.getKhataUserName());
                     onItemClicked.khataClicked(khataModel);
                 }
                 return true;

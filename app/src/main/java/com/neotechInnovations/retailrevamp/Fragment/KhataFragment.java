@@ -117,7 +117,7 @@ public class KhataFragment extends Fragment {
         sbSerialNumber.append(" ) ",new StyleSpan(Typeface.NORMAL),Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         txtKhataUserSerialNumber.setText(sbSerialNumber);
         txtKhataUserPhone.setText(khataModel.getKhataUserPhone());
-        Log.d(TAG, "manipulateViews: khataModel ID : "+khataModel.getKhataUserId());
+//        Log.d(TAG, "manipulateViews: khataModel ID : "+khataModel.getKhataUserId());
         ivBackBtn.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -171,7 +171,17 @@ public class KhataFragment extends Fragment {
 //        transactionModelList=HomepageActivity.khataTransactionModelList;
     }
     public void initialiseTransactionRecyclerView(){
-        khataTransactions= new TransactionAdapter(transactionModelList,activity);
+        khataTransactions= new TransactionAdapter(transactionModelList, activity, Tags.KEY_SPECIFIC, new TransactionAdapter.OnButtonClick() {
+            @Override
+            public void onDeleteTransaction(TransactionModel transactionModel) {
+
+            }
+
+            @Override
+            public void onRestoreTransaction(TransactionModel transactionModel) {
+
+            }
+        });
         rvKhataTransactions.setLayoutManager(new LinearLayoutManager(activity,LinearLayoutManager.VERTICAL,false));
         rvKhataTransactions.setAdapter(khataTransactions);
     }
