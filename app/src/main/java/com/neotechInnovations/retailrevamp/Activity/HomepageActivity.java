@@ -5,6 +5,11 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
@@ -22,8 +27,10 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.PagerSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
@@ -816,12 +823,12 @@ public class HomepageActivity extends AppCompatActivity {
             @Override
             public void onDeleteTransaction(TransactionModel transactionModel) {
                 new Thread(() -> {
-                    boolean isTransactionDeleted=false;
+                    boolean isTransactionDeleted = false;
                     for (int i = 0; i < transactionModelList.size(); i++) {
                         if (transactionModel.getId() != null
                                 && transactionModelList.get(i).getId() != null
                                 && transactionModel.getId().equals(transactionModelList.get(i).getId())) {
-                            isTransactionDeleted=true;
+                            isTransactionDeleted = true;
                             transactionModelList.get(i).setDeleted(true);
                             break;
                         }
@@ -847,6 +854,7 @@ public class HomepageActivity extends AppCompatActivity {
 
             }
         });
+        setupSwipe();
         rvRecents.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         rvRecents.setAdapter(transactionAdapter);
         Log.d(TAG, "initialiseTransactionRecyclerView: ....");
@@ -1643,5 +1651,122 @@ public class HomepageActivity extends AppCompatActivity {
         calcAllStatsInfo();
         initialiseStatsInfoRecyclerView();
         syncLists();
+    }
+
+    public void setupSwipe() {
+        ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView,
+                                  @NonNull RecyclerView.ViewHolder viewHolder,
+                                  @NonNull RecyclerView.ViewHolder target) {
+                return false; // Not used
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                int position = viewHolder.getAdapterPosition();
+                TransactionModel transactionModel = transactionModelList.get(position);
+
+//                if (direction == ItemTouchHelper.RIGHT) {
+//                    // Swipe right action: Call
+//                    Intent callIntent = new Intent(Intent.ACTION_DIAL);
+//                    callIntent.setData(Uri.parse("tel:1234567890")); // Replace with contact number
+//                    startActivity(callIntent);
+//                } else
+                if (transactionModel.getTransaction() && direction == ItemTouchHelper.LEFT) {
+                    // Swipe left action: Message
+                    for (int i = 0; i < transactionModelList.size(); i++) {
+                        if (transactionModel.getId() != null
+                                && transactionModelList.get(i).getId() != null
+                                && transactionModel.getId().equals(transactionModelList.get(i).getId())) {
+//                                isTransactionDeleted=true;
+                            transactionModelList.get(i).setDeleted(true);
+                            Toast.makeText(getApplicationContext(), "Transaction deleted ", Toast.LENGTH_SHORT).show();
+                            break;
+                        }
+                    }
+                    // Notify dataset changes on the main thread
+//                        if (isTransactionDeleted)
+                    runOnUiThread(() -> transactionChanged());
+                }
+            }
+
+            @Override
+            public int getMovementFlags(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
+                int position = viewHolder.getAdapterPosition();
+                TransactionModel transactionModel = transactionModelList.get(position);
+                // Allow only left swipe
+                if(transactionModel.getTransaction()){
+                    int swipeFlags = ItemTouchHelper.LEFT;
+                    return makeMovementFlags(0, swipeFlags);
+                }else{
+                    return makeMovementFlags(0, 0);
+                }
+            }
+
+            @Override
+            public void onChildDraw(@NonNull Canvas canvas,
+                                    @NonNull RecyclerView recyclerView,
+                                    @NonNull RecyclerView.ViewHolder viewHolder,
+                                    float dX, float dY, int actionState, boolean isCurrentlyActive) {
+                View itemView = viewHolder.itemView;
+
+                // Calculate opacity for the main item based on swipe distance
+                int itemAlpha = (int) Math.max(255 - Math.abs(dX) / 2, 0); // Decrease alpha as dX increases
+                itemView.setAlpha(itemAlpha / 255f); // Set the item's alpha (0.0f to 1.0f)
+
+                Paint paint = new Paint();
+                paint.setTextSize(48);
+                paint.setColor(Color.WHITE);
+                paint.setTextAlign(Paint.Align.CENTER);
+
+//                if (dX > 0) { // Swiping to the right
+//                    // Draw green background
+//                    paint.setColor(ContextCompat.getColor(getApplicationContext(), R.color.increasing_green));
+//                    canvas.drawRect((float) itemView.getLeft(), (float) itemView.getTop(),
+//                            dX, (float) itemView.getBottom(), paint);
+//
+//                    // Draw "Call" text
+//                    paint.setColor(Color.WHITE);
+//                    canvas.drawText("Call",
+//                            (float) itemView.getLeft() + dX / 2,
+//                            (float) (itemView.getTop() + itemView.getBottom()) / 2,
+//                            paint);
+//                } else
+                if (dX < 0) { // Swiping to the left
+                    // Draw blue background
+                    paint.setColor(ContextCompat.getColor(getApplicationContext(), R.color.decreasing_red));
+                    canvas.drawRect((float) itemView.getRight() + dX, (float) itemView.getTop(),
+                            (float) itemView.getRight(), (float) itemView.getBottom(), paint);
+
+                    // Draw "Message" text
+//                    paint.setColor(Color.WHITE);
+//                    canvas.drawText("Delete",
+//                            (float) itemView.getRight() + dX / 2,
+//                            (float) (itemView.getTop() + itemView.getBottom()) / 2,
+//                            paint);
+                    // Load the image resource
+                    Bitmap icon = BitmapFactory.decodeResource(recyclerView.getResources(), R.drawable.iv_delete_red_32);
+
+                    // Calculate the position for the image
+                    float iconTop = itemView.getTop() + (itemView.getHeight() - icon.getHeight()) / 2;
+                    float iconLeft = itemView.getRight() - icon.getWidth() - 30; // 50px padding
+                    float iconRight = itemView.getRight() - 30; // 50px padding
+                    float iconBottom = iconTop + icon.getHeight();
+// Calculate the opacity based on the swipe distance
+//                    int alpha = (int) Math.max(Math.abs(dX) / 2 -255, 0); // Lower alpha as you swipe more
+//                    paint.setAlpha(alpha);
+                    // Draw the image
+                    canvas.drawBitmap(icon, iconLeft, iconTop, paint);
+                }
+
+                super.onChildDraw(canvas, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+            }
+        };
+
+
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallback);
+        itemTouchHelper.attachToRecyclerView(rvRecents);
+
     }
 }

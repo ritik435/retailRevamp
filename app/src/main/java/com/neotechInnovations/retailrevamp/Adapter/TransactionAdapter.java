@@ -87,7 +87,7 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
             }
             if ( openedFrom.equals(Tags.KEY_HOME)) {
                 Log.d(TAG, "onBindViewHolder: openedFrom : deleted is visible for position : "+position);
-                holder.ivDeleteTransaction.setVisibility(View.VISIBLE);
+//                holder.ivDeleteTransaction.setVisibility(View.VISIBLE);
                 holder.ivDeleteTransaction.setOnClickListener(view -> {
                     //delete a transaction.
                     onButtonClick.onDeleteTransaction(transactionModel);
